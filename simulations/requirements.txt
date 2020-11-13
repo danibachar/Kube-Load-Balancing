@@ -1,0 +1,5 @@
+Mosek
+networkx
+numpy
+scipy
+matplotlib
