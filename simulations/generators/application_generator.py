@@ -2,12 +2,11 @@ from models.consts import bookinfo_application_location_graph
 from models.topology import CloudProvider, Region, Zone
 from models.kubernetes import Cluster, Service, ServiceDependency
 
-def generate_application(destination_func):
+def generate_application(destination_func, cost_func):
 
     # First zones!
     locations = bookinfo_application_location_graph["locations"]
-    pricing = bookinfo_application_location_graph["pricing"]
-    zones = _generate_zones(locations, pricing)
+    zones = _generate_zones(locations, cost_func)
     # Second Service!
     services_config = bookinfo_application_location_graph["services_config"]
     clusters_info = bookinfo_application_location_graph["clusters"]
@@ -30,13 +29,12 @@ def _generate_clusters(clusters_inf, zones, services_config, destination_func):
     for idx, (full_zone_name, cluster) in enumerate(clusters_inf.items()):
         zone = zone_by_name(zones, full_zone_name)[0]
         cluster_services = cluster["services"]
-        latency_map = cluster["latency"]
-        c = _generate_cluster(full_zone_name, cluster_services, zone, latency_map, services_config, destination_func)
+        c = _generate_cluster(full_zone_name, cluster_services, zone, services_config, destination_func)
         clusters.append(c)
     return clusters
 
-def _generate_cluster(id, cluster_services, zone, latency_map, services_config, destination_func):
-    cluster = Cluster(id, zone, latency_map)
+def _generate_cluster(id, cluster_services, zone, services_config, destination_func):
+    cluster = Cluster(id, zone)
     services = _generate_services(cluster_services, zone, services_config, destination_func)
     for service in services:
         cluster.add_service(service)
@@ -60,20 +58,21 @@ def _generate_service(service_name, service_capacity, services_config, destinati
     service = Service(service_name, dependencies, service_name, service_capacity, destination_func)
     return service
 
-def _generate_zones(locations, pricing):
+def _generate_zones(locations, cost_func):
     zones = []
-    for location in locations:
-        zone_parts = location.split("-")
-        zone = _generate_zone(zone_parts, pricing)
+    for locatino_name, location in locations.items():
+        zone_parts = locatino_name.split("-")
+        zone = _generate_zone(zone_parts, location, cost_func)
         zones.append(zone)
     return zones
 
-def _generate_zone(zone_parts, pricing):
+def _generate_zone(zone_parts, location, cost_func):
     if len(zone_parts) != 3:
         print("Zone must be complete - ", zone_parts)
         return None
-
+    pricing = location["pricing"]
+    latency = location["latency"]
     cp = CloudProvider(zone_parts[0])
     region = Region("-".join(zone_parts[1:3]))
-    zone = Zone("1", region, cp, pricing)
+    zone = Zone("1", region, cp, pricing, latency, cost_func)
     return zone

@@ -1,22 +1,26 @@
-import time, random, math, json, threading
+import time, random, math, json, threading, logging, collections
 from datetime import datetime
 from collections import Counter
-import logging
-import asyncio
-from concurrent.futures import ThreadPoolExecutor
+from multiprocessing.pool import ThreadPool
 
 class Cluster:
     """Representing a Kubernetes Cluster"""
 
-    def __init__(self, id, zone, latency_map):
+    def __init__(self, id, zone):
         self.id = id
         self.zone = zone
-        self.latency_map = latency_map
         self.services = {}
-        self.mesh = {}
+        self.mesh = collections.OrderedDict()
 
     def __str__(self):
         return str(self.__class__) + ": " + str(self.__dict__)
+
+    def __hash__(self):
+        h = hash((self.id, self.zone))
+        return h
+
+    def __eq__(self, other):
+        return self.id == other.id and self.zone == other.zone
 
     def _service(self, job_type):
         return self.services.get(job_type, None)
@@ -51,25 +55,34 @@ class Cluster:
 
     def consume(self, job):
         job.arriavl_time = datetime.now()
-        logging.info("cluster:{} consume - {}".format(self.id,job))
-        self._service(job.type).consume(job)
+        logging.debug("cluster:{} consume - {}".format(self.id,job))
+        service = self._service(job.type)
+        if not service:
+            logging.error("cluster:{}\ncannot consume:{} - not supported service".format(self.id,job))
+            return False
+        return service.consume(job)
 
-    def wait_for_jobs_to_finish(self):
-        logging.info("cluster:{} wait_for_jobs_to_finish:{}".format(self.id,len(self.services)))
+    def thread_clenup(self):
+        logging.info("cluster:{} thread_clenup:{}".format(self.id,len(self.services)))
         for s in self.services.values():
-            s.wait_for_jobs_to_finish()
+            s.thread_clenup()
 
     def sum_traffic_sent(self):
         traffic_sum = {}
         for service in self.services.values():
-            for cluster_name, traffic_map in service.total_traffic_sent.items():
-                if cluster_name not in traffic_sum:
-                    traffic_sum[cluster_name] = {}
-                res = Counter(traffic_sum[cluster_name])
+            for zone, traffic_map in service.total_traffic_sent.items():
+                if zone not in traffic_sum:
+                    traffic_sum[zone] = {}
+                res = Counter(traffic_sum[zone])
                 s = Counter(traffic_map)
-                traffic_sum[cluster_name] = dict(res+s)
+                traffic_sum[zone] = dict(res+s)
 
         return traffic_sum
+
+    def reset_traffic_sent(self):
+        for service in self.services.values():
+            service.total_traffic_sent = {}
+
 
 
 class Service:
@@ -79,6 +92,7 @@ class Service:
         self.id = id
         self.job_type = job_type
         self.capacity = capacity # RPS
+        # self.THREAD_POOL = ThreadPool(processes=capacity)
         self.dest_func = dest_func
         self.consumed_jobs = []
         self.dependencies = dependencies
@@ -112,53 +126,65 @@ class Service:
     def consume(self, job):
         logging.debug("service consume - {}".format(job))
         self.consumed_jobs.append(job)
-        # 1) Reduce capacity by job.load for job.duration time
-        self._reduce_capacity(job.load, job.duration)
-        # 2) propogate requests to dependencies
-        self._send(job)
+        return self._send(job)
 
-    def wait_for_jobs_to_finish(self):
+    def thread_clenup(self):
         logging.info("service:{} wait_for_jobs_to_finish:{}".format(self.full_name,len(self.reduce_capacity_jobs)))
-        for j in self.reduce_capacity_jobs:
-            j.join()
-
-    def _reduce_capacity(self, load, duration):
-        logging.info("service:{} _reduce_capacity - load={}, duration={}".format(self.full_name,load,duration))
-        def time_load(load, duration):
-            logging.debug("service:{}\ntime_load:begin, current load = {}, load to add = {}".format(self.full_name, self.load, load))
-            self.load += load
-            time.sleep(duration)
-            self.load -= load
-            logging.debug("service:{}\ntime_load:end, current load = {}, load to add = {}".format(self.full_name, self.load, load))
-        thread = threading.Thread(target = time_load, args = (load, duration))
-        self.reduce_capacity_jobs.append(thread)
-        thread.start()
+        self.THREAD_POOL.close()
 
     def _send(self, job):
+        self.load += job.load
         # Needs to propogate the job for each dependency
         # For simplecity we take the same duration
+        futures = []
         for dependency in self.dependencies:
             target_cluster = self._choose_target_cluster(dependency)
-            if target_cluster.id not in self.total_traffic_sent:
-                self.total_traffic_sent[target_cluster.id] = {}
-            if dependency.job_type not in self.total_traffic_sent[target_cluster.id]:
-                self.total_traffic_sent[target_cluster.id][dependency.job_type] = 0
-            self.total_traffic_sent[target_cluster.id][dependency.job_type]+=1
+            if target_cluster.zone not in self.total_traffic_sent:
+                self.total_traffic_sent[target_cluster.zone] = {}
+            if dependency.job_type not in self.total_traffic_sent[target_cluster.zone]:
+                self.total_traffic_sent[target_cluster.zone][dependency.job_type] = 0
 
-            new_job = Job(self.cluster.id, job.duration, job.load, dependency.job_type)
+            self.total_traffic_sent[target_cluster.zone][dependency.job_type]+=1
+
+            new_job = Job(self.cluster, job.duration, job.load, dependency.job_type)
             logging.info("service:{}\n_send\njob{}\nto:{}".format(self.full_name,new_job,target_cluster))
-            target_cluster.consume(new_job)
+            # async_result = self.THREAD_POOL.apply_async(target_cluster.consume, (new_job,)) # tuple of args for foo
+            async_result = target_cluster.consume(new_job)
+            futures.append(async_result)
+
+
+        # time.sleep(job.duration) # Wait for me
+        did_succeed = True
+        for f in futures:
+            # did_succeed = did_succeed and f.get()
+            did_succeed = did_succeed and f
+        self.load -= job.load
+        logging.info("service:{}\ndone".format(self.full_name))
+        return did_succeed
 
     def _choose_target_cluster(self, dependency):
         # Prefer local cluster if job is supported
         if dependency.job_type in self.cluster.supported_job_types():
-            logging.info("service:{}\n_choose_target_cluster:{}\nfor dependency:{}\nLOCAL".format(self.full_name,self.cluster,dependency))
+            # logging.info("service:{}\n_choose_target_cluster:{}\nfor dependency:{}\nLOCAL".format(self.full_name,self.cluster,dependency))
+            # print("choose local cluster")
             return self.cluster
         # Choose from mesh according to dest function
         mesh = list(self.cluster.mesh.values())
         possible_clusters = list(filter(lambda c: dependency.job_type in c.supported_job_types(), mesh))
-        cluster = self.dest_func(possible_clusters, self.cluster.id)
-        logging.info("service:{}\n_choose_target_cluster:{}\nfor dependency:{}\nDEST_FUNC".format(self.full_name,cluster,dependency))
+        # clusters_weights = list(map(lambda cluster: cluster.zone.weight_according_to(self.zone), possible_clusters))
+        clusters_weights = list(map(lambda cluster: self.zone.weight_according_to(cluster.zone), possible_clusters))
+        # normelized_weights
+        def normalize(weight, weight_sum, num_of_options):
+            percent = (1 - weight / weight_sum) /  (num_of_options - 1)
+            return percent
+        weight_sum = sum(clusters_weights)
+        num_of_options = len(clusters_weights)
+        normalized_weights = [normalize(w, weight_sum, num_of_options) for w in clusters_weights]
+        
+        cluster = self.dest_func(possible_clusters, normalized_weights, self.cluster.id)
+        # cluster_index = possible_clusters.index(cluster)
+        # print("choose cluster index = ",cluster_index)
+        # logging.info("service:{}\n_choose_target_cluster:{}\nfor dependency:{}\nDEST_FUNC".format(self.full_name,cluster,dependency))
         return cluster
 
 class ServiceDependency:

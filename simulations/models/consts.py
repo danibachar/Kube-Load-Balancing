@@ -26,57 +26,89 @@ bookinfo_application_location_graph = {
             "incoming_req_size": 200, # in KB
         },
     },
-    "locations": ["aws-us-east", "gcp-us-west", "gcp-eu-zurich", "aws-brazil-saopaulo", "gcp-ociana-sydney"],
-    "pricing": { # Per GB
-        "internet": 0.09,
-        "cross-region": 0.02,
-        "cross-zone": 0.01,
+    "locations": {
+        "aws-us-east": {
+            "pricing": { # Per GB
+                "internet": 0.09,
+                "cross-region": 0.02,
+                "cross-zone": 0.01,
+            },
+            "latency": { # in ms
+                "gcp-us-west": 100,
+                "gcp-eu-zurich": 200,
+                "aws-brazil-saopaulo": 150,
+                "gcp-ociana-sydney": 300
+            }
+        },
+        "gcp-us-west": {
+            "pricing": { # Per GB
+                "internet": 0.09,
+                "cross-region": 0.02,
+                "cross-zone": 0.01,
+            },
+            "latency": {
+                "aws-us-east": 100,
+                "gcp-eu-zurich": 250,
+                "aws-brazil-saopaulo": 150,
+                "gcp-ociana-sydney": 300
+            }
+        },
+        "gcp-eu-zurich": {
+            "pricing": { # Per GB
+                "internet": 0.09,
+                "cross-region": 0.02,
+                "cross-zone": 0.01,
+            },
+            "latency": {
+                "aws-us-east": 150,
+                "gcp-us-west": 250,
+                "aws-brazil-saopaulo": 150,
+                "gcp-ociana-sydney": 300
+            }
+        },
+        "aws-brazil-saopaulo": {
+            "pricing": { # Per GB
+                "internet": 0.09,
+                "cross-region": 0.02,
+                "cross-zone": 0.01,
+            },
+            "latency": {
+                "aws-us-east": 150,
+                "gcp-us-west": 100,
+                "gcp-eu-zurich": 200,
+                "gcp-ociana-sydney": 300
+            }
+        },
+        "gcp-ociana-sydney": {
+            "pricing": { # Per GB
+                "internet": 0.09,
+                "cross-region": 0.02,
+                "cross-zone": 0.01,
+            },
+            "latency": {
+                "aws-us-east": 150,
+                "gcp-us-west": 100,
+                "gcp-eu-zurich": 200,
+                "aws-brazil-saopaulo": 150,
+            }
+        },
     },
     "clusters": {
         "aws-us-east": {
             "services": [("product_page", 50), ("review1",150), ("review2",100), ("details",150)], # capacity
-            "latency": { # in ms
-                "gcp-us-west": 100,
-                "gcp-eu": 200,
-                "aws-south-brazil": 150,
-                "gep-ociana-sydney": 300
-            }
         },
         "gcp-us-west": {
             "services": [("product_page", 50), ("review2", 100), ("raiting", 200)],
-            "latency": {
-                "aws-us-east": 100,
-                "gcp-eu": 250,
-                "aws-south-brazil": 150,
-                "gep-ociana-sydney": 300
-            }
         },
         "gcp-eu-zurich": {
             "services": [("product_page", 50), ("review1", 150), ("details",100), ("raiting", 175)],
-            "latency": {
-                "aws-us-east": 150,
-                "gcp-us-west": 250,
-                "aws-south-brazil": 150,
-                "gep-ociana-sydney": 300
-            }
         },
         "aws-brazil-saopaulo": {
             "services": [("product_page", 50), ("review2", 100), ("review3",200), ("raiting", 175)],
-            "latency": {
-                "aws-us-east": 150,
-                "gcp-us-west": 100,
-                "gcp-eu": 200,
-                "gep-ociana-sydney": 300
-            }
+
         },
         "gcp-ociana-sydney":{
             "services": [("product_page", 50), ("review3",100), ("details", 50), ("raiting", 50)],
-            "latency": {
-                "aws-us-east": 150,
-                "gcp-us-west": 100,
-                "gcp-eu": 200,
-                "aws-south-brazil": 150,
-            }
         },
     },
 
