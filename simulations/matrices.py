@@ -82,21 +82,6 @@ def _sim_matrix(clusters):
         json.dump(sim_matrix, outfile)
     return sim_matrix
 
-def jobs_to_arraive_in_next_tik(tik, jobs_loads):
-    if len(jobs_loads) <= tik:
-        return None
-    return jobs_loads[tik+1]
-
-# Some jobs depend on others
-def calc_total_job_juration(job, cluster):
-    duration = job.duration
-    service = cluster._service(job.type)
-    # max_duration = job.duration
-    for dependency in service.dependencies:
-        duration += job.duration
-
-    return duration
-
 def simulate_job_sending(job, cluster, tik):
     service = cluster._service(job.type)
 
@@ -105,7 +90,6 @@ def simulate_job_sending(job, cluster, tik):
     service.load += job.load
 
     for dependency in service.dependencies:
-        new_job = Job(service.cluster, job.duration, job.load, dependency.job_type, job)
         target_cluster = service._choose_target_cluster(dependency)
 
         if target_cluster.zone not in service.total_traffic_sent:
@@ -116,39 +100,60 @@ def simulate_job_sending(job, cluster, tik):
         service.total_traffic_sent[target_cluster.zone][dependency.job_type]+=1
 
         job_latency = cluster.zone.latency_per_request(target_cluster.zone)/1000
+        new_job = Job(
+            service.cluster,
+            job.duration,
+            job.load,
+            dependency.job_type,
+            job,
+            job_latency
+        )
+        job.propogated_jobs.append(new_job)
         simulate_job_sending(new_job, target_cluster, tik+job_latency)
+
+def calc_job_total_duration(job):
+    max_prop_duration = 0
+    for propogated_job in job.propogated_jobs:
+        max_prop_duration = max(max_prop_duration, calc_job_total_duration(propogated_job))
+    return job.duration+job.job_latency+max_prop_duration
 
 def end_job_if_needed(job, cluster, tik):
     service = cluster._service(job.type)
-    if service:
-        if job in service.consumed_jobs:
-            job_ttl = job.arriavl_time + calc_total_job_juration(job, cluster)
-            # print("found matching job:{}\ntik:{}\nttl:{}".format(job.type, tik, job_ttl))
-            if tik >= job_ttl:
-                # print("job:{} has left the building\nafter:{}".format(job.id, tik-job_ttl))
-                service.load -= job.load
-                service.consumed_jobs.remove(job)
-                return True
-    return False
+    if service is None:
+        print("Error - no service in cluster:{} for job:{}".format(cluster.id, job.type))
+        return False
+
+    if job not in service.consumed_jobs:
+        print("Error - job:{} was not consumed by service:{}".format(job.id, service.full_name))
+        return False
+
+    job_ttl = job.arriavl_time + calc_job_total_duration(job)
+
+    if tik < job_ttl:
+        return False
+
+    service.load -= job.load
+    service.consumed_jobs.remove(job)
+    return True
+
 
 def simulate_job_ending_if_needed(job, cluster, tik):
-    did_leave = end_job_if_needed(job, cluster, tik)
-
     all_clusters = list(cluster.mesh.values())+[cluster]
-
-    jobs_to_check_removal = []
-
+    propogated_jobs_and_clusters = []
     for c in all_clusters:
         for service in c.services.values():
             for consumed_job in service.consumed_jobs:
                 if consumed_job.source_job and consumed_job.source_job.id == job.id:
-                    jobs_to_check_removal.append((consumed_job,c))
+                    propogated_jobs_and_clusters.append((consumed_job, c))
 
-    # start = datetime.now()
-    for job_to_check in jobs_to_check_removal:
-        # start = datetime.now()
-        simulate_job_ending_if_needed(job_to_check[0], job_to_check[1], tik)
-        # print("recursion took:{}\nfor:{}\nlen:{}".format(datetime.now()-start, tik, len(jobs_to_check_removal)))
+    all_propogated_leave = True
+    for propogated_job, choosed_cluster in propogated_jobs_and_clusters:
+        all_propogated_leave = all_propogated_leave and simulate_job_ending_if_needed(propogated_job, choosed_cluster, tik)
+
+    did_leave = False
+    if all_propogated_leave:
+        did_leave = end_job_if_needed(job, cluster, tik)
+
     return did_leave
 
 def clean_obsolete_jobs(jobs, clusters, tik):
@@ -200,10 +205,10 @@ def run(clusters, jobs_loads, front_end):
     loads = []
     for tik, load in enumerate(jobs_loads):
         load = int(load)
-        single_job = Job(None, 0.25, 1, front_end)
-        jobs.append(single_job)
 
         for i in range(0, load):
+            single_job = Job(None, 0.25, 1, front_end)
+            jobs.append(single_job)
             for cluster in clusters:
                 simulate_job_sending(single_job, cluster, tik)
 
@@ -212,7 +217,6 @@ def run(clusters, jobs_loads, front_end):
         costs.append(traffic_cost(clusters))
 
         # Clean jobs at the end of each tik
-
         total_jobs_before_clean = sum([len(s.consumed_jobs) for c in clusters for s in c.services.values()])
         print("total_jobs_before_clean",total_jobs_before_clean)
 
@@ -238,6 +242,11 @@ def run(clusters, jobs_loads, front_end):
     print("took {} more tiks for all jobs to leave the system".format(tiks_more - len(jobs_loads)))
     _sim_matrix(clusters)
     plot_avg(costs, times, loads)
+
+def jobs_to_arraive_in_next_tik(tik, jobs_loads):
+    if len(jobs_loads) <= tik:
+        return None
+    return jobs_loads[tik+1]
 
 jobs_loads = heavy_tail_jobs_distribution("pareto", 25, 5)
 for f in [round_robin, smooth_weighted_round_robin]:

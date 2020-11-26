@@ -195,7 +195,7 @@ class ServiceDependency:
 class Job:
     """Representing a Job in the system"""
 
-    def __init__(self, source_cluster, duration, load, type, source_job=None):
+    def __init__(self, source_cluster, duration, load, type, source_job=None,job_latency=0):
         self.id = uuid.uuid4()
         self.source_cluster = source_cluster
         self.duration = duration
@@ -204,6 +204,8 @@ class Job:
         self.type = type
         self.arriavl_time = None
         self.source_job = source_job
+        self.propogated_jobs = []
+        self.job_latency = job_latency
 
     def __str__(self):
         return str(self.__class__) + ": " + str(self.__dict__)
