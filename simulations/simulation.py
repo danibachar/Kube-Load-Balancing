@@ -8,6 +8,7 @@ from models.kubernetes import Job
 from generators.application_generator import generate_application
 from load_balancing.round_robin import round_robin, smooth_weighted_round_robin, reset_state
 from utils.cost import simple_addative_weight
+from utils.distributions import heavy_tail_jobs_distribution
 
 from ploter import plot
 
@@ -15,28 +16,23 @@ from multiprocessing.pool import ThreadPool
 
 now = datetime.now()
 log_file_name = 'logs/simulation.{}.log'.format(now)
-logging.basicConfig(filename=log_file_name, level=logging.CRITICAL)
-
-def job_count():
-    lower = 5  # the lower bound for your values - minimal job count
-    shape = 2   # the distribution shape parameter, also known as `a` or `alpha`
-    size = 50 # the size of your sample (number of random values)
-    jobs_distribution = random.pareto(a=shape, size=size) + lower
+logging.basicConfig(filename=log_file_name, level=logging.INFO)
 
 jobs_duration = [1, 0.25, 0.5, 2]
 def load(cluster, jobs_count, front_end):
-    # pool = ThreadPool(processes=jobs_count)
+    jobs_count = int(jobs_count)
+    pool = ThreadPool(processes=jobs_count)
     duration = random.choice(jobs_duration)
     single_job = Job(None, 0.1, 1, front_end)
     # print("running job:{}\non cluster:{}\n".format(single_job, cluster.id))
     results = []
-    for job in range(0,jobs_count):
-        async_result = cluster.consume(single_job)
-        # async_result = pool.apply_async(cluster.consume, (single_job,))
+    for job in range(0, jobs_count):
+        # async_result = cluster.consume(single_job)
+        async_result = pool.apply_async(cluster.consume, (single_job,))
         results.append(async_result)
         # did_succeed = did_succeed and cluster.consume(single_job)
-    # pool.close()
-    # pool.join()
+    pool.close()
+    pool.join()
     did_succeed = True
     for r in results:
         # did_succeed = did_succeed and r.get()
@@ -68,43 +64,42 @@ def traffic_cost(clusters):
     return cost
 
 def simulate(clusters, load_per_cluster, front_end):
-    # pool = ThreadPool(processes=len(clusters))
-    # results = []
+    pool = ThreadPool(processes=len(clusters))
+    results = []
     for cluster in clusters:
-        load(cluster, load_per_cluster, front_end)
+        # load(cluster, load_per_cluster, front_end)
         # break
-        # async_result = pool.apply_async(load, (cluster, load_per_cluster, front_end))
-        # results.append((async_result, cluster.id))
+        async_result = pool.apply_async(load, (cluster, load_per_cluster, front_end))
+        results.append((async_result, cluster.id))
 
-    # pool.close()
-    # pool.join()
+    pool.close()
+    pool.join()
 
     # for task, cluster_id in results:
     #     res = async_result.get()
         # print("cluster:{}\nresult:{}".format(cluster_id, res))
 
     # Cleanup
-    # for cluster in clusters:
-    #     cluster.thread_clenup()
+    for cluster in clusters:
+        cluster.thread_clenup()
 
     return traffic_cost(clusters)
 
-def run(dest_func, cost_func, did_reset_state):
+def run(dest_func, cost_func, did_reset_state, jobs_loads):
     costs = []
     times = []
     loads = []
     clusters, front_end = generate_application(dest_func, cost_func)
-    for time in range(1, 20):
+    for idx, job_load in enumerate(jobs_loads):
         for cluster in clusters:
             cluster.reset_traffic_sent()
-        load_per_front_end = 50*time
-        cost = simulate(clusters, load_per_front_end, front_end)
+        cost = simulate(clusters, job_load, front_end)
         costs.append(cost)
-        loads.append(load_per_front_end)
-        times.append(time)
+        loads.append(job_load)
+        times.append(idx)
 
     # Dump results
-    prefix = "reset" if did_reset_state else "no_rest"
+    prefix = "reset" if did_reset_state else "no_reset"
     with open('runs/{}.{}.{}.txt'.format(dest_func.__name__, prefix, datetime.now()), 'w') as outfile:
         data = {
             "costs": costs,
@@ -121,11 +116,12 @@ def selection_func(sign):
 
 possible_funcs = [1]
 states = [True]
-tests = 20
+tests = 1
+jobs_loads = heavy_tail_jobs_distribution("pareto", 100, 45)
 for func_sign in possible_funcs:
     for should_reset_state in states:
         for test in range(0,tests):
             dest_func = selection_func(func_sign)
             if should_reset_state:
                 reset_state()
-            run(dest_func, simple_addative_weight, should_reset_state)
+            run(dest_func, simple_addative_weight, should_reset_state, jobs_loads)

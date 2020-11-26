@@ -3,7 +3,6 @@ from models.topology import CloudProvider, Region, Zone
 from models.kubernetes import Cluster, Service, ServiceDependency
 
 def generate_application(destination_func, cost_func):
-
     # First zones!
     locations = bookinfo_application_location_graph["locations"]
     zones = _generate_zones(locations, cost_func)
@@ -12,7 +11,29 @@ def generate_application(destination_func, cost_func):
     clusters_info = bookinfo_application_location_graph["clusters"]
     clusters = _generate_clusters(clusters_info, zones, services_config, destination_func)
     _create_full_cluster_mesh(clusters)
+    _update_clusters_weights(clusters)
     return clusters, "product_page"
+
+def _update_clusters_weights(clusters):
+    def normalize(weight, weight_sum, num_of_options):
+        percent = (1 - weight / weight_sum) /  max(1, num_of_options - 1)
+        return percent
+
+    for idx in range(0, len(clusters)):
+        cluster = clusters[idx]
+        mesh = list(cluster.mesh.values())
+        for service in cluster.services.values():
+            for dependency in service.dependencies:
+                if dependency.job_type in cluster.supported_job_types():
+                    continue
+                possible_clusters = list(filter(lambda c: dependency.job_type in c.supported_job_types(), mesh))
+                clusters_costs = list(map(lambda c: cluster.zone.cost_according_to(c.zone), possible_clusters))
+                cost_sum = sum(clusters_costs)
+                num_of_options = len(clusters_costs)
+                for idx, dest_cluster in enumerate(possible_clusters):
+                    cost = cluster.zone.cost_according_to(dest_cluster.zone)
+                    weight = normalize(cost, cost_sum, num_of_options)
+                    cluster.update_weight_for(dependency.job_type, dest_cluster.zone, weight)
 
 def _create_full_cluster_mesh(clusters):
     for idx in range(0, len(clusters)):

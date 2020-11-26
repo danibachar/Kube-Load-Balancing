@@ -95,20 +95,20 @@ bookinfo_application_location_graph = {
     },
     "clusters": {
         "aws-us-east": {
-            "services": [("product_page", 50), ("review1",150), ("review2",100), ("details",150)], # capacity
+            "services": [("product_page", 5), ("review1",15), ("review2",10), ("details",15)], # capacity
         },
         "gcp-us-west": {
-            "services": [("product_page", 50), ("review2", 100), ("raiting", 200)],
+            "services": [("product_page", 5), ("review2", 10), ("raiting", 20)],
         },
         "gcp-eu-zurich": {
-            "services": [("product_page", 50), ("review1", 150), ("details",100), ("raiting", 175)],
+            "services": [("product_page", 5), ("review1", 15), ("details",10), ("raiting", 17)],
         },
         "aws-brazil-saopaulo": {
-            "services": [("product_page", 50), ("review2", 100), ("review3",200), ("raiting", 175)],
+            "services": [("product_page", 5), ("review2", 10), ("review3",20), ("raiting", 17)],
 
         },
         "gcp-ociana-sydney":{
-            "services": [("product_page", 50), ("review3",100), ("details", 50), ("raiting", 50)],
+            "services": [("product_page", 5), ("review3",10), ("details", 5), ("raiting", 5)],
         },
     },
 

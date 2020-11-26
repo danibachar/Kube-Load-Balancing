@@ -16,3 +16,4 @@
 *.log
 *.pyc
 simulations/runs/*
+*.json

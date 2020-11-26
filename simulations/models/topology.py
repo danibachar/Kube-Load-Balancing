@@ -32,7 +32,9 @@ class Zone:
     def full_name(self):
         return "-".join([self.name, self.id])
 
-    def weight_according_to(self, other_zone):
+    def cost_according_to(self, other_zone):
+        if self == other_zone:
+            return 0
 
         min_price = self.pricing["cross-zone"]
         min_latency = min(self.latency.values())
@@ -46,6 +48,8 @@ class Zone:
         logging.debug("pricing:{}".format(self.pricing))
         is_same_cloud_provider = self.cloud_provider == other_zone.cloud_provider
         is_same_region = self.region == other_zone.region
+        # if self == other_zone:
+        #     return 0
         if is_same_cloud_provider:
             if is_same_region:
                 return self.pricing["cross-zone"]
@@ -55,7 +59,7 @@ class Zone:
     def latency_per_request(self, other_zone):
         logging.debug("checking latency from:{} <-> to:{}".format(self.name, other_zone.name))
         logging.debug("latency:{}".format(self.latency))
-        return self.latency.get(other_zone.name, None)
+        return self.latency.get(other_zone.name, 0)
 
 class CloudProvider:
     """Representing a Cloud Provider"""

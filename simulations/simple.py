@@ -1,6 +1,9 @@
 import time, random, math, json, threading
 import numpy as np
 from scipy.optimize import linprog
+from scipy.stats import pareto, lognorm
+
+from matplotlib import pyplot as plt
 
 import asyncio
 import concurrent.futures
@@ -117,11 +120,69 @@ async def main():
 #     loop.run_until_complete(main())
 
 
-from load_balancing.round_robin import round_robin, smooth_weighted_round_robin
+# from load_balancing.round_robin import round_robin, smooth_weighted_round_robin
+#
+# options = [1,2,3,4,5]
+# weights = [1,0.01,0.01,0.01,0.01]
+# key = "key"
+#
+# for i in range(0,10):
+#     print(smooth_weighted_round_robin(options, weights, key))
 
-options = [1,2,3,4,5]
-weights = [1,0.01,0.01,0.01,0.01]
-key = "key"
+def _pareto_job_disribution():
+    lower = 50  # the lower bound for your values - minimal job count
+    shape = 2   # the distribution shape parameter, also known as `a` or `alpha`
+    size = 20 # the size of your sample (number of random values)
+    # jobs_distribution = (np.random.pareto(a=shape, size=(0,5,size)) + 1) * lower
+    # jobs_distribution = np.random.pareto(a=shape, size=size) + lower
+    # jobs_distribution = np.random.pareto(a=50, size=size)
+    # x = np.linspace(0, 30, 100)
+    # jobs_distribution = pareto.pdf(x, scale = 1, b = 50)
+    x = np.linspace(0, 50, 1000)
+    jobs_distribution = pareto.pdf(x, 50, 20, 30)
+    return jobs_distribution
 
-for i in range(0,10):
-    print(smooth_weighted_round_robin(options, weights, key))
+# x = np.linspace(0, 70, 20)
+# print(x)
+# jobs_distribution = pareto.pdf(x, scale = 40, b = 1)
+# print(jobs_distribution)
+# plt.plot(x, jobs_distribution)
+# plt.show()
+
+m = 5
+size = (200,)
+a = 10#size[0]*m
+s = (np.random.pareto(a, size = size) + 1) * m
+# s = np.random.pareto(a, size = size)
+print(s)
+count, bins, _ = plt.hist(s, 100, density=True)
+plt.show()
+
+# mu = 0.
+# sigma = 0.5
+# s = np.random.lognormal(mu, sigma, 1000)
+# print(s)
+# count, bins, ignored = plt.hist(s, 100, density=True, align='mid')
+# plt.show()
+
+
+def lognorm_params(mode, stddev):
+    """
+    Given the mode and std. dev. of the log-normal distribution, this function
+    returns the shape and scale parameters for scipy's parameterization of the
+    distribution.
+    """
+    p = np.poly1d([1, -1, 0, 0, -(stddev/mode)**2])
+    r = p.roots
+    sol = r[(r.imag == 0) & (r.real > 0)].real
+    shape = np.sqrt(np.log(sol))
+    scale = mode * sol
+    return shape, scale
+
+# mode = 123
+# stddev = 99
+# sigma, scale = lognorm_params(mode, stddev)
+# sample = lognorm.rvs(sigma, 0, scale, size=1000)
+# print(sample)
+# tmp = plt.hist(sample, normed=True, bins=1000, alpha=0.6, color='c', ec='c')
+# plt.show()
