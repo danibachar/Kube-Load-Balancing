@@ -178,8 +178,9 @@ class Service:
         mesh = list(self.cluster.mesh.values())
         possible_clusters = list(filter(lambda c: dependency.job_type in c.supported_job_types(), mesh))
         clusters_weights = list(map(lambda c: self.cluster.weights[dependency.job_type][c.zone], possible_clusters))
-
-        cluster = self.dest_func(possible_clusters, clusters_weights, self.full_name)
+        key = self.full_name + "->" + dependency.job_type
+        cluster = self.dest_func(possible_clusters, clusters_weights, key)
+        # print("choose:{}\nfor:{}\nfrom possible:{}\nby:{}".format(cluster.id, dependency.job_type, [pc.id for pc in possible_clusters], self.full_name))
         logging.info("service:{}\n_choose_target_cluster:{}\nfor dependency:{}\nDEST_FUNC".format(self.full_name,cluster,dependency))
         return cluster
 

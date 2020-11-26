@@ -99,6 +99,7 @@ def calc_total_job_juration(job, cluster):
 
 def simulate_job_sending(job, cluster, tik):
     service = cluster._service(job.type)
+
     job.arriavl_time = tik
     service.consumed_jobs.add(job)
     service.load += job.load
