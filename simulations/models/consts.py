@@ -10,18 +10,18 @@ bookinfo_application_location_graph = {
             "incoming_req_size": 400, # in KB
         },
         "review2": {
-            "dependencies": ["raiting"],
+            "dependencies": ["rating"],
             "incoming_req_size": 450, # in KB
         },
         "review3": {
-            "dependencies": ["raiting"],
+            "dependencies": ["rating"],
             "incoming_req_size": 350, # in KB
         },
         "details": {
             "dependencies": [],
             "incoming_req_size": 250, # in KB
         },
-        "raiting": {
+        "rating": {
             "dependencies": [],
             "incoming_req_size": 200, # in KB
         },
@@ -98,17 +98,17 @@ bookinfo_application_location_graph = {
             "services": [("product_page", 5), ("review1",15), ("review2",10), ("details",15)], # capacity
         },
         "gcp-us-west": {
-            "services": [("product_page", 5), ("review2", 10), ("raiting", 20)],
+            "services": [("product_page", 5), ("review2", 10), ("rating", 20)],
         },
         "gcp-eu-zurich": {
-            "services": [("product_page", 5), ("review1", 15), ("details",10), ("raiting", 17)],
+            "services": [("product_page", 5), ("review1", 15), ("details",10), ("rating", 17)],
         },
         "aws-brazil-saopaulo": {
-            "services": [("product_page", 5), ("review2", 10), ("review3",20), ("raiting", 17)],
+            "services": [("product_page", 5), ("review2", 10), ("review3",20), ("rating", 17)],
 
         },
         "gcp-ociana-sydney":{
-            "services": [("product_page", 5), ("review3",10), ("details", 5), ("raiting", 5)],
+            "services": [("product_page", 5), ("review3",10), ("details", 5), ("rating", 5)],
         },
     },
 

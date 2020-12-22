@@ -59,7 +59,7 @@ def traffic_cost(clusters):
             latency = cluster.zone.latency_per_request(other_cluster_zone)
             sum_requests = sum(traffic_map.values()) # Note - change in future to take req size into account
             # print("latency:{}\nprice:{}\nsum:{}".format(latency, price, sum_requests))
-            cost += sum_requests * simple_addative_weight(price, latency, min_price, min_latency)
+            cost += sum_requests * simple_addative_weight(price, min_price, latency, min_latency)
             # break
     return cost
 

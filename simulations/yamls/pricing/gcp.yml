@@ -1,0 +1,83 @@
+name: gcp
+zones:
+  from:
+    all: free
+regions:
+  from:
+    US: 0.01
+    AF: 0.08
+    EU: 0.02
+    AP: 0.05
+    SA: 0.08
+cross-regions:
+  from:
+    MOST: 0.08
+    OCEANIA: 0.15
+worldwide:
+  from:
+    US:
+      to:
+        MOST:
+          1TB: 0.12
+          10TB: 0.11
+          MORE: 0.08
+        OCEANIA:
+          1TB: 0.19
+          10TB: 0.18
+          MORE: 0.15
+    EU:
+      to:
+        MOST:
+          1TB: 0.12
+          10TB: 0.11
+          MORE: 0.08
+        OCEANIA:
+          1TB: 0.19
+          10TB: 0.18
+          MORE: 0.15
+    AP-EAST:
+      to:
+        MOST:
+          1TB: 0.12
+          10TB: 0.11
+          MORE: 0.08
+        OCEANIA:
+          1TB: 0.19
+          10TB: 0.18
+          MORE: 0.15
+    AP-NORTHEAST:
+      to:
+        MOST:
+          1TB: 0.14
+          10TB: 0.14
+          MORE: 0.12
+        OCEANIA:
+          1TB: 0.19
+          10TB: 0.18
+          MORE: 0.15
+    OCEANIA:
+      to:
+        MOST:
+          1TB: 0.19
+          10TB: 0.18
+          MORE: 0.15
+    AP-SOUTH:
+      to:
+        MOST:
+          1TB: 0.12
+          10TB: 0.11
+          MORE: 0.08
+        OCEANIA:
+          1TB: 0.19
+          10TB: 0.18
+          MORE: 0.15
+    SA:
+      to:
+        MOST:
+          1TB: 0.12
+          10TB: 0.11
+          MORE: 0.08
+        OCEANIA:
+          1TB: 0.19
+          10TB: 0.18
+          MORE: 0.15

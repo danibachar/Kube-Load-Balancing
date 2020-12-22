@@ -3,3 +3,7 @@ networkx
 numpy
 scipy
 matplotlib
+pulp==2.3.1
+ortools
+pyyaml
+pulp

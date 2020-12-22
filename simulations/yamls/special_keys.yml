@@ -1,0 +1,31 @@
+keys:
+  COEANIA:
+    aws:
+      - ap-southeast-1
+    gcp:
+      - australia-southeast1
+  SYDNEY:
+    aws:
+      - ap-southeast-1
+    gcp:
+      - australia-southeast1
+  AUSTRALIA:
+    aws:
+      - ap-southeast-1
+    gcp:
+      - australia-southeast1
+  AU:
+    aws:
+      - ap-southeast-1
+    gcp:
+      - australia-southeast1
+  SINGAPORE:
+    aws:
+      - ap-southeast-2
+    gcp:
+      - asia-southeast-1
+  CANADA:
+    aws:
+      - ca-central-1
+    gcp:
+      - northamerica-northeast1

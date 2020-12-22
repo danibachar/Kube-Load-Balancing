@@ -1,5 +1,5 @@
 
-import json, sys
+import json, sys, time
 from datetime import datetime
 import numpy as np
 
@@ -8,6 +8,7 @@ from generators.application_generator import generate_application
 from load_balancing.round_robin import round_robin, smooth_weighted_round_robin, reset_state
 from utils.cost import simple_addative_weight
 from utils.distributions import heavy_tail_jobs_distribution
+from utils.weights import weights_for
 
 from ploter import plot
 
@@ -80,12 +81,14 @@ def _sim_matrix(clusters):
     # print(sim_matrix)
     with open('matrices/sim_mat.{}.json'.format(datetime.now()), 'w') as outfile:
         json.dump(sim_matrix, outfile)
+
     return sim_matrix
 
 def simulate_job_sending(job, cluster, tik):
     service = cluster._service(job.type)
 
-    job.arriavl_time = tik
+    job.arrival_time = tik
+    service.jobs_consumed_per_time_slot[-1][0]+=1
     service.consumed_jobs.add(job)
     service.load += job.load
 
@@ -127,7 +130,7 @@ def end_job_if_needed(job, cluster, tik):
         print("Error - job:{} was not consumed by service:{}".format(job.id, service.full_name))
         return False
 
-    job_ttl = job.arriavl_time + calc_job_total_duration(job)
+    job_ttl = job.arrival_time + calc_job_total_duration(job)
 
     if tik < job_ttl:
         return False
@@ -135,7 +138,6 @@ def end_job_if_needed(job, cluster, tik):
     service.load -= job.load
     service.consumed_jobs.remove(job)
     return True
-
 
 def simulate_job_ending_if_needed(job, cluster, tik):
     all_clusters = list(cluster.mesh.values())+[cluster]
@@ -182,7 +184,7 @@ def traffic_cost(clusters):
             latency = cluster.zone.latency_per_request(other_cluster_zone)
             sum_requests = sum(traffic_map.values()) # Note - change in future to take req size into account
             # print("latency:{}\nprice:{}\nsum:{}".format(latency, price, sum_requests))
-            cost += sum_requests * simple_addative_weight(price, latency, min_price, min_latency)
+            cost += sum_requests * simple_addative_weight(price, min_price, latency, min_latency)
             # break
     return cost
 
@@ -198,13 +200,14 @@ def plot_avg(costs, times, loads, title_prefix=""):
         cost_title = title_prefix + " " + cost_title
     )
 
-def run(clusters, jobs_loads, front_end):
+def run(clusters, jobs_loads, front_end, updating_weights_technique, model):
     jobs = []
     costs = []
     times = []
     loads = []
     for tik, load in enumerate(jobs_loads):
         load = int(load)
+        st = time.time()
 
         for i in range(0, load):
             single_job = Job(None, 0.25, 1, front_end)
@@ -218,37 +221,84 @@ def run(clusters, jobs_loads, front_end):
 
         # Clean jobs at the end of each tik
         total_jobs_before_clean = sum([len(s.consumed_jobs) for c in clusters for s in c.services.values()])
-        print("total_jobs_before_clean",total_jobs_before_clean)
+        # print("total_jobs_before_clean",total_jobs_before_clean)
 
-        start = datetime.now()
+        # start = datetime.now()
 
         jobs = clean_obsolete_jobs(jobs, clusters, tik)
 
         total_jobs_after_clean = sum([len(s.consumed_jobs) for c in clusters for s in c.services.values()])
-        time = datetime.now() - start
+        # time = datetime.now() - start
 
-        print("clean tik:{}\ntook:{}\ntotal jobs in the system:{}\n".format(tik, time, total_jobs_after_clean))
+        # print("clean tik:{}\ntook:{}\ntotal jobs in the system:{}\n".format(tik, time, total_jobs_after_clean))
 
-        if tik % 5 == 0:
+        if tik % 10 == 0:
+            update_clusters_weights(clusters, updating_weights_technique)
             _sim_matrix(clusters)
 
         for cluster in clusters:
             cluster.reset_traffic_sent()
 
+        # print("Iteration took", time.time()-st)
+
     tiks_more = len(jobs_loads)
     while len(jobs) > 0:
         jobs = clean_obsolete_jobs(jobs, clusters, tiks_more)
         tiks_more+=1
-    print("took {} more tiks for all jobs to leave the system".format(tiks_more - len(jobs_loads)))
+    # print("took {} more tiks for all jobs to leave the system".format(tiks_more - len(jobs_loads)))
     _sim_matrix(clusters)
-    plot_avg(costs, times, loads)
+    # print("model = {},costs = {}".format(model, sum(costs)))
+    # plot_avg(costs, times, loads)
+    return costs, loads, times
 
 def jobs_to_arraive_in_next_tik(tik, jobs_loads):
     if len(jobs_loads) <= tik:
         return None
     return jobs_loads[tik+1]
 
-jobs_loads = heavy_tail_jobs_distribution("pareto", 25, 5)
-for f in [round_robin, smooth_weighted_round_robin]:
-    clusters, front_end = generate_application(f, simple_addative_weight)
-    run(clusters, jobs_loads, front_end)
+def update_clusters_weights(clusters, weighting_technique):
+    weights = weights_for(weighting_technique, clusters)
+    # print("weights = {}".format(weights))
+    for cluster in clusters:
+        cluster.weights = weights[cluster.id]
+
+
+def main():
+    funcs = [round_robin, smooth_weighted_round_robin, smooth_weighted_round_robin]
+    # funcs = [smooth_weighted_round_robin]
+    jobs_loads = heavy_tail_jobs_distribution("pareto", 100, 5)
+    costs_map = {}
+    for fi in range(len(funcs)):
+        f = funcs[fi]
+        updating_weights_technique = "smooth_weighted_round_robin"
+        if fi == 2:
+            updating_weights_technique = "model_2"
+        # updating_weights_technique = "model_2"
+        clusters, front_end = generate_application(f, simple_addative_weight)
+        update_clusters_weights(clusters, updating_weights_technique)
+        # st = time.time()
+        costs, loads, times = run(clusters, jobs_loads, front_end, updating_weights_technique, fi)
+        # print("Run took", time.time()-st)
+        costs_map[fi] = (costs, loads, times)
+    return costs_map
+
+if __name__ == '__main__':
+    # pulp_main()
+    costs = {}
+    for i in range(1):
+        st = time.time()
+        _costs = main()
+        print("Main {} took {}".format(i, time.time()-st))
+        for key, val in _costs.items():
+            if key not in costs:
+                costs[key] = [val]
+            else:
+                costs[key].append(val)
+    for key, val in costs.items():
+        sum_costs = [sum(v[0]) for v in val]
+
+        print("model = {}, avg cost = {}".format(key, np.mean(sum_costs)))
+        costs = [v[0] for v in val]
+        times = [v[2] for v in val]
+        loads = [v[1] for v in val]
+        plot_avg(np.mean(costs,axis=0), np.mean(times,axis=0), np.mean(loads,axis=0))

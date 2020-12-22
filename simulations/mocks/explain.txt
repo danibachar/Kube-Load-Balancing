@@ -60,7 +60,7 @@ according to normal/uniform/pareto distribution [citation]
 
 regular load (i.e regular tests) - that the system can handle - i.e choose (load/users/rps) at random (normal/uniform/pareto distribution) form a given range (min-max)
 2) high load (i.e stress tests) - where a percentage OVER the regular load is choose at random (normal/uniform/pareto distribution) form a given range (min-max)
-3) burst load (part of stress tests) - where load on the system is arriaving in burst, and between bursts it is either regular or lower than usuall
+3) burst load (part of stress tests) - where load on the system is arriving in burst, and between bursts it is either regular or lower than usuall
 4) under attack (i.e extream stress tests) - where the system
 
 Users simulation can use Load Testing tool such as lucust(https://locust.io/) / Jmeter, where one just configure the desire user behaviour to test...

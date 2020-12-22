@@ -48,8 +48,8 @@ class Cluster:
         services = set(self.services.values())
         return set(map(lambda service: service.zone, services))
 
-    def available_capacity(job_type):
-        services = self._service(job_type)
+    def available_capacity(self, job_type, at_tik):
+        service = self._service(job_type)
         if service is None:
             return -1 # incating no support at all
         return service.residual_capacity
@@ -61,7 +61,7 @@ class Cluster:
         self.weights[job_type][to_zone] = weight
 
     def consume(self, job):
-        job.arriavl_time = datetime.now()
+        job.arrival_time = datetime.now()
         logging.debug("cluster:{} consume - {}".format(self.id,job))
         service = self._service(job.type)
         if not service:
@@ -88,7 +88,7 @@ class Cluster:
 
     def reset_traffic_sent(self):
         for service in self.services.values():
-            service.total_traffic_sent = {}
+            service.reset_traffic_sent()
 
 class Service:
     """Representing a Kubernetes Service"""
@@ -106,6 +106,7 @@ class Service:
         self.load = 0
         self.cluster = None
         self.reduce_capacity_jobs = []
+        self.jobs_consumed_per_time_slot = [[0]]
 
     def __str__(self):
         return str(self.__class__) + ": " + str(self.__dict__)
@@ -129,8 +130,13 @@ class Service:
         logging.debug("service add_to_cluster - {}".format(cluster))
         self.cluster = cluster
 
+    def reset_traffic_sent(self):
+        self.jobs_consumed_per_time_slot.append([0])
+        self.total_traffic_sent = {}
+
     def consume(self, job):
         logging.debug("service consume - {}".format(job))
+        self.jobs_consumed_per_time_slot[-1]+=1
         self.consumed_jobs.add(job)
         return self._send(job)
 
@@ -198,11 +204,13 @@ class Job:
     def __init__(self, source_cluster, duration, load, type, source_job=None,job_latency=0):
         self.id = uuid.uuid4()
         self.source_cluster = source_cluster
+        self.target_cluster = None
+
         self.duration = duration
         self.load = load
-        # self.available_destinations = available_destinations
+
         self.type = type
-        self.arriavl_time = None
+        self.arrival_time = None
         self.source_job = source_job
         self.propogated_jobs = []
         self.job_latency = job_latency
