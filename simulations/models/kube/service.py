@@ -61,6 +61,16 @@ class Service:
     def full_name(self):
         return "-".join([self.job_type, self.zone.full_name])
 
+    def _supported_clusters_for(self, job_type):
+        mesh = self.cluster.mesh.values()
+        return list(filter(lambda c: job_type in c.supported_job_types(), mesh))
+
+    def _fetch_all_similar_jobs(self):
+        supported_clusters = self._supported_clusters_for(self.job_type)
+        service_supporting_my_job_type = [cluster.service(self.job_type) for cluster in supported_clusters]
+        jobs_avg = [s.jobs_consumed_per_time_slot for s in service_supporting_my_job_type]
+        return job_avg
+
     @property
     def jobs_consumed_per_time_slot(self):
         groups = self.job_data_frame.groupby("arrival_time")
@@ -96,6 +106,8 @@ class Service:
         self.job_data_frame.loc[selector, "consumed"] = True
 
     def consume(self, job):
+        if job.type != self.job_type:
+            raise
         # logging.debug("service consume - {}".format(job))
         # st = time.time()
         self._propogate(job)
@@ -139,6 +151,7 @@ class Service:
         if source_zone:
             source_zone_name = job.source_zone.full_name
         cost_in_usd, size_in_gb = self._calc_job_traffic_cost_and_size(job)
+
         self.data_frames_to_add.append([
             job.id,
             job.type,
@@ -186,8 +199,7 @@ class Service:
             return self.cluster
 
         # Choose from mesh according to dest function
-        mesh = self.cluster.mesh.values()
-        possible_clusters = list(filter(lambda c: dependency.job_type in c.supported_job_types(), mesh))
+        possible_clusters = self._supported_clusters_for(dependency.job_type)
         clusters_weights = list(map(lambda c: self.cluster.weights[dependency.job_type][c.zone], possible_clusters))
         key = self.full_name + "->" + dependency.job_type
         cluster = self.dest_func(possible_clusters, clusters_weights, key)

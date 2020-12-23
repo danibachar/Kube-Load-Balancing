@@ -45,13 +45,6 @@ class Cluster:
     def supported_job_types(self):
         return set(self.services.keys())
 
-    def traffic_payment_for_last_tik(self, at_tik):
-        return sum([s.traffic_payment_for_last_tik(at_tik) for s in self.services.values()])
-
-    def avg_latency_for_last_tik(self, at_tik):
-        latencies =  [s.avg_latency_for_last_tik(at_tik) for s in self.services.values()]
-        return sum(latencies) / len(latencies)
-
     def available_capacity(self, job_type, at_tik):
         service = self.service(job_type)
         if service is None:

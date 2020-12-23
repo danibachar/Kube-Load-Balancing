@@ -3,29 +3,6 @@ import numpy as np
 import math, time
 from pulp import *
 
-def _weights_for_model_1(clusters):
-    res = {} # Map of maps, cluster.id <-> weights map
-    for cluster in clusters:
-        weights_map = {}
-        mesh = list(cluster.mesh.values())
-
-        for service in cluster.services.values():
-            expected_jobs_to_be_sent = len(service.consumed_jobs)
-
-            for dependency in service.dependencies:
-                if dependency.job_type in cluster.supported_job_types():
-                    continue
-
-                possible_clusters = list(filter(lambda c: dependency.job_type in c.supported_job_types(), mesh))
-                loads = [1 for _ in range(0,expected_jobs_to_be_sent)] # 1 load per job
-                weights = _weights_for_model_1_helper(cluster, possible_clusters, loads, dependency.job_type)
-                for idx in range(0,len(possible_clusters)):
-                    dest_cluster = possible_clusters[idx]
-                    weight = weights[idx]
-                    weights_map[dependency.job_type][dest_cluster.zone] = weight
-
-    return res
-
 def _weights_for_swrr(clusters):
     def normalize(weight, weight_sum, num_of_options):
         percent = (1 - weight / weight_sum) /  max(1, num_of_options - 1)
@@ -163,8 +140,6 @@ def _weights_costly_bin_packing(clusters, at_tik):
                     clusters_cost=data["clusters_cost"],
                     clusters_cap=data["clusters_cap"],
                 )
-                # loads = [1 for _ in range(0, expected_jobs_to_be_sent)] # 1 load per job
-                # weights = _weights_for_model_1_helper(cluster, possible_clusters, loads, dependency.job_type)
                 for idx, dest_cluster in enumerate(possible_clusters):
                     if dependency.job_type not in weights_map:
                         weights_map[dependency.job_type] = {}
@@ -180,8 +155,6 @@ def weights_for(technique, clusters, at_tik=0):
         return {}
     if technique == "smooth_weighted_round_robin":
         return _weights_for_swrr(clusters)
-    if technique == "model_1":
-        return _weights_for_model_1(clusters)
     if technique == "model_2":
         # start_time = time.time()
         weights = _weights_costly_bin_packing(clusters, at_tik)
