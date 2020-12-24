@@ -1,6 +1,8 @@
 import collections, logging, time
 import pandas as pd
 
+consumes_times = []
+
 class Cluster:
     """Representing a Kubernetes Cluster"""
 
@@ -66,14 +68,16 @@ class Cluster:
             service.update_df()
 
     def consume(self, job ,at_tik):
+        global consumes_times
         # st = time.time()
         job.arrival_time = at_tik
 
         # logging.debug("cluster:{} consume - {}".format(self.id,job))
-        service = self.service(job.type)
-        if not service:
-            logging.error("cluster:{}\ncannot consume:{} - not supported service".format(self.id,job))
+        srv = self.service(job.type)
+        if not srv:
+            logging.error("cluster:{}\ncannot consume:{} - not supported service".format(self.id, job))
             return
-        service.consume(job)
+        srv.consume(job)
         # print("cluster = {}\nconsumed job {}\nat tik  = {}\nwith ttl = {}".format(self.id, job.type, at_tik, job.ttl))
-        # print("cluster consume job took", time.time()-st)
+        # consumes_times.append("cluster consume job={} took={}".format(job.type,time.time()-st))
+        # print(consumes_times[-1])

@@ -24,6 +24,8 @@ class Service:
 
         self.dest_func = dest_func
 
+        self.loads_cache = {}
+
         self.data_frames_to_add = []
         self._df_columns = [
             "job_id", # str
@@ -69,32 +71,36 @@ class Service:
         supported_clusters = self._supported_clusters_for(self.job_type)
         service_supporting_my_job_type = [cluster.service(self.job_type) for cluster in supported_clusters]
         jobs_avg = [s.jobs_consumed_per_time_slot for s in service_supporting_my_job_type]
-        return job_avg
+        return jobs_avg
 
     @property
     def jobs_consumed_per_time_slot(self):
-        groups = self.job_data_frame.groupby("arrival_time")
-        _jobs_consumed_per_time_slot = []
-        for group in groups:
-            _jobs_consumed_per_time_slot.append(len(group[-1].index))
+        mean_job_count = self.job_data_frame.groupby("arrival_time").size().mean()
+        if mean_job_count == 0 or np.isnan(mean_job_count):
+            return self.capacity
+        return mean_job_count
 
-        if len(_jobs_consumed_per_time_slot) == 0:
-            return [[self.capacity]]
-        # print("return _jobs_consumed_per_time_slot", _jobs_consumed_per_time_slot)
-        return _jobs_consumed_per_time_slot
+    @property
+    def jobs_consumed_per_time_slot_across_mesh(self):
+        mesh_jobs = self._fetch_all_similar_jobs()
+        mesh_jobs.append(self.jobs_consumed_per_time_slot)
+        sum = np.sum(mesh_jobs)
+        return sum
 
     def residual_capacity(self, at_tik):
         load = self.load(at_tik)
         return self.capacity - load
 
     def load(self, at_tik):
-        # print("job_data_frame", self.job_data_frame[["arrival_time", "ttl"]])
+        # cached_load = self.loads_cache.get(at_tik,None)
+        # if cached_load:
+        #     print("hit")
+        #     return cached_load
         selector = (self.job_data_frame["ttl"] > at_tik)
         jobs_not_done = self.job_data_frame.loc[selector]
-        # print("checking service = {}\nat tik = {}".format(self.full_name, at_tik))
-        # print("jobs not done", jobs_not_done["ttl"])
+
         load = jobs_not_done["load"].sum()
-        # print("load", load)
+        # self.loads_cache[at_tik]=load
         return load
 
     def add_to_cluster(self, cluster):
@@ -108,16 +114,21 @@ class Service:
     def consume(self, job):
         if job.type != self.job_type:
             raise
-        # logging.debug("service consume - {}".format(job))
-        # st = time.time()
+        logging.debug("service consume - {}".format(job))
+        # If service is loaded we need to increase latency, according to the load
+        current_load = self.load(job.arrival_time)
+        if current_load >= self.capacity:
+            print("@@@@@@@@@@@@@@@@@@@@")
+            print("job duration penalty")
+            print("@@@@@@@@@@@@@@@@@@@@")
+            job._duration = job._duration*(current_load/current_cpacity)
         self._propogate(job)
         self._collect(job)
-        # print("service consume_count = ", consume_count)
-        # print("service consume job took", time.time()-st)
 
     def update_df(self):
         if len(self.data_frames_to_add) == 0:
             print("no df to add", self.full_name)
+            print(self.zone.cost_func)
             return
         self.job_data_frame = pd.DataFrame(
             self.data_frames_to_add,
@@ -133,7 +144,7 @@ class Service:
         one_million = 1_000_000
         size_in_gb = self.expected_outbound_req_size_kb/one_million
         cost_in_usd = 0
-        # if job.source_zone:
+
         cost_in_usd += size_in_gb * self.zone.price_per_gb(job.source_zone)
 
         for pj in job.propogated_jobs:
@@ -195,7 +206,7 @@ class Service:
     def _choose_target_cluster(self, dependency):
         # Prefer local cluster if job is supported
         if dependency.job_type in self.cluster.supported_job_types():
-            # logging.info("service:{}\n_choose_target_cluster:{}\nfor dependency:{}\nLOCAL".format(self.full_name,self.cluster,dependency))
+            logging.info("service:{}\n_choose_target_cluster:{}\nfor dependency:{}\nLOCAL".format(self.full_name,self.cluster,dependency))
             return self.cluster
 
         # Choose from mesh according to dest function
@@ -203,5 +214,5 @@ class Service:
         clusters_weights = list(map(lambda c: self.cluster.weights[dependency.job_type][c.zone], possible_clusters))
         key = self.full_name + "->" + dependency.job_type
         cluster = self.dest_func(possible_clusters, clusters_weights, key)
-        # logging.info("service:{}\n_choose_target_cluster:{}\nfor dependency:{}\nDEST_FUNC".format(self.full_name,cluster,dependency))
+        logging.info("service:{}\n_choose_target_cluster:{}\nfor dependency:{}\nDEST_FUNC".format(self.full_name,cluster,dependency))
         return cluster

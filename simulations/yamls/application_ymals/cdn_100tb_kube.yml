@@ -5,29 +5,29 @@ services:
     dependencies:
       review1:
         name: review
-        req_size: 50
+        req_size: 5_000_000
       details:
         name: details
-        req_size: 50
-    expected-outbound-req-size-kb: 50
+        req_size: 5_000_000
+    expected-outbound-req-size-kb: 5_000_000
   review:
     name: review
     label: internal
     dependencies:
       rating:
         name: rating
-        req_size: 50
-    expected-outbound-req-size-kb: 50
+        req_size: 5_000_000
+    expected-outbound-req-size-kb: 5_000_000
   details:
     name: details
     label: internal
     dependencies: {}
-    expected-outbound-req-size-kb: 50
+    expected-outbound-req-size-kb: 5_000_000
   rating:
     name: rating
     label: internal
     dependencies: {}
-    expected-outbound-req-size-kb: 50
+    expected-outbound-req-size-kb: 5_000_000
 
 app-topology:
   aws-us-east-1:
@@ -37,10 +37,10 @@ app-topology:
           rps_capacity: 50
       review:
           name: review
-          rps_capacity: 90
+          rps_capacity: 250
       details:
           name: details
-          rps_capacity: 90
+          rps_capacity: 250
   gcp-us-west-1:
     services:
       product_page:
@@ -48,7 +48,7 @@ app-topology:
           rps_capacity: 50
       rating:
           name: rating
-          rps_capacity: 90
+          rps_capacity: 250
   gcp-eu-west-1:
     services:
       product_page:
@@ -56,13 +56,13 @@ app-topology:
           rps_capacity: 50
       review:
           name: review
-          rps_capacity: 90
+          rps_capacity: 250
       rating:
           name: rating
-          rps_capacity: 90
+          rps_capacity: 250
       details:
           name: details
-          rps_capacity: 90
+          rps_capacity: 250
   aws-sa-east-1:
     services:
       product_page:
@@ -70,7 +70,7 @@ app-topology:
           rps_capacity: 50
       review:
           name: review
-          rps_capacity: 90
+          rps_capacity: 250
   gcp-asia-east-1:
     services:
       product_page:
@@ -78,7 +78,7 @@ app-topology:
           rps_capacity: 50
       details:
           name: details
-          rps_capacity: 90
+          rps_capacity: 250
       rating:
           name: rating
-          rps_capacity: 90
+          rps_capacity: 250

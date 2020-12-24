@@ -1,8 +1,7 @@
 import pandas as pd
 
 # Each criteria get equal weight for now
-
-def simple_addative_weight(
+def simple_min_addative_weight(
     price,
     min_price,
     latency,
@@ -18,5 +17,18 @@ def simple_addative_weight(
 
     return price_part + latency_part
 
-def calc_cost_generated_by(service, pricing_maps, latency_matrix):
-    jobs_df = service.job_data_frame
+def simple_max_addative_weight(
+    price,
+    max_price,
+    latency,
+    max_latency
+):
+    if max_price == 0:
+        raise
+    if max_latency == 0:
+        raise
+
+    price_part = (price / max_price) * 0.5
+    latency_part = (latency / max_latency) * 0.5
+
+    return price_part + latency_part

@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import random
 from scipy.signal import savgol_filter
+import numpy as np
 
 def rand_hex():
     return "#"+"%06x" % random.randint(0, 0xFFFFFF)
@@ -151,10 +152,74 @@ def full_plot(traffic_costs, avg_latency, loads, times, title_prefix):
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     plt.show()
 
-def bar_plot(bars_values, bars_names, extra_values, title):
-    fig, ax = plt.subplots()
-    ax.set_title(title)
-    ax.bar(bars_names, bars_values, color = 'red')
+def bar_plot(
+    x_values=[],
+
+    bars_values=[],
+    bar_titles=[],
+    bar_improvments=[],
+    bars_title="Total Traffic Pricing",
+    bars_y_label="$",
+
+    scatter_values=[],
+    scatter_titles=[],
+    scatter_improvments=[],
+    scatter_title="Avg Latency Per Request",
+    scatter_y_label="ms",
+
+    line_values=[],
+    line_titles=[],
+    line_improvments=[],
+    line_title="Total Additive Cost",
+    line_y_label="",
+
+    job_duration_values=[],
+    job_duration_titles=[],
+    job_duration_improvments=[],
+    job_duration_title="Avg Job Duration",
+    job_duration_y_label="ms",
+
+    title=""
+):
+    x = np.arange(len(x_values))  # the label locations
+    fig, axs = plt.subplots(2,2)
+    fig.suptitle(title)
+
+    axs[0,0].bar(x, bars_values ,color = 'red')
+    axs[0,0].set_xticks(x)
+    axs[0,0].set_xticklabels(x_values)
+    axs[0,0].set_title(bars_title)
+    axs[0,0].set_ylabel(bars_y_label)
+
     for i, value in enumerate(bars_values):
-        ax.text(bars_names[i],value-2, extra_values[i], color = 'black', ha='center', fontweight='bold')
+        text = bar_titles[i]+"\n"+bar_improvments[i]
+        axs[0,0].text(x[i], value-min(bars_values)/2, text, color = 'black', ha='center')
+
+    axs[0,1].bar(x, scatter_values,color = 'blue')
+    axs[0,1].set_xticks(x)
+    axs[0,1].set_xticklabels(x_values)
+    axs[0,1].set_title(scatter_title)
+    axs[0,1].set_ylabel(scatter_y_label)
+    for i, value in enumerate(scatter_values):
+        text = scatter_titles[i]+"\n"+scatter_improvments[i]
+        axs[0,1].text(x[i], value-min(scatter_values)/2, text, color = 'black', ha='center')
+
+    axs[1,0].bar(x, line_values,color = 'green')
+    axs[1,0].set_xticks(x)
+    axs[1,0].set_xticklabels(x_values)
+    axs[1,0].set_title(line_title)
+    axs[1,0].set_ylabel(line_y_label)
+    for i, value in enumerate(line_values):
+        text = line_titles[i]+"\n"+line_improvments[i]
+        axs[1,0].text(x[i], value-min(line_values)/2, text, color = 'black', ha='center')
+
+    axs[1,1].bar(x, job_duration_values, color = 'purple')
+    axs[1,1].set_xticks(x)
+    axs[1,1].set_xticklabels(x_values)
+    axs[1,1].set_title(job_duration_title)
+    axs[1,1].set_ylabel(job_duration_y_label)
+    for i, value in enumerate(job_duration_values):
+        text = job_duration_titles[i]+"\n"+job_duration_improvments[i]
+        axs[1,1].text(x[i], value-min(job_duration_values)/2, text, color = 'black', ha='center')
+
     plt.show()

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from models.kubernetes import Job
 from generators.application_generator import generate_application
 from load_balancing.round_robin import round_robin, smooth_weighted_round_robin, reset_state
-from utils.cost import simple_addative_weight
+from utils.cost import simple_min_addative_weight
 from utils.distributions import heavy_tail_jobs_distribution
 
 from ploter import plot
@@ -59,7 +59,7 @@ def traffic_cost(clusters):
             latency = cluster.zone.latency_per_request(other_cluster_zone)
             sum_requests = sum(traffic_map.values()) # Note - change in future to take req size into account
             # print("latency:{}\nprice:{}\nsum:{}".format(latency, price, sum_requests))
-            cost += sum_requests * simple_addative_weight(price, min_price, latency, min_latency)
+            cost += sum_requests * simple_min_addative_weight(price, min_price, latency, min_latency)
             # break
     return cost
 
@@ -124,4 +124,4 @@ for func_sign in possible_funcs:
             dest_func = selection_func(func_sign)
             if should_reset_state:
                 reset_state()
-            run(dest_func, simple_addative_weight, should_reset_state, jobs_loads)
+            run(dest_func, simple_min_addative_weight, should_reset_state, jobs_loads)

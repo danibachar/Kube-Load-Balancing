@@ -6,7 +6,7 @@ import numpy as np
 from models.kubernetes import Job
 from generators.application_generator import generate_application
 from load_balancing.round_robin import round_robin, smooth_weighted_round_robin, reset_state
-from utils.cost import simple_addative_weight
+from utils.cost import simple_min_addative_weight
 from utils.distributions import heavy_tail_jobs_distribution
 from utils.weights import weights_for
 
@@ -184,7 +184,7 @@ def traffic_cost(clusters):
             latency = cluster.zone.latency_per_request(other_cluster_zone)
             sum_requests = sum(traffic_map.values()) # Note - change in future to take req size into account
             # print("latency:{}\nprice:{}\nsum:{}".format(latency, price, sum_requests))
-            cost += sum_requests * simple_addative_weight(price, min_price, latency, min_latency)
+            cost += sum_requests * simple_min_addative_weight(price, min_price, latency, min_latency)
             # break
     return cost
 
@@ -274,7 +274,7 @@ def main():
         if fi == 2:
             updating_weights_technique = "model_2"
         # updating_weights_technique = "model_2"
-        clusters, front_end = generate_application(f, simple_addative_weight)
+        clusters, front_end = generate_application(f, simple_min_addative_weight)
         update_clusters_weights(clusters, updating_weights_technique)
         # st = time.time()
         costs, loads, times = run(clusters, jobs_loads, front_end, updating_weights_technique, fi)
