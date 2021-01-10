@@ -1,9 +1,59 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.signal import lfilter
 
 from utils.plots import plot_avg, full_plot, bar_plot
+from utils.cost import simple_max_addative_weight
 
-def plot(dfs):
+def _build_comparison_map(dfs):
+    comparisons = {}
+    for iteration, iteration_dfs in dfs.items():
+        for func, df in iteration_dfs.items():
+            if comparisons.get(func, None) is None:
+                comparisons[func] = pd.concat(df.values())
+            else:
+                comparisons[func] = pd.concat([comparisons[func]] + list(df.values()))
+
+    return comparisons
+
+def _plot_service_loads(dfs):
+    # load
+    _dfs = []
+    for key, df in dfs.items():
+        df["load_balance"] = key
+    dfs = pd.concat(dfs)
+    n = 20  # the larger n is, the smoother curve will be
+    b = [1.0 / n] * n
+    a = 1
+
+    plots_count = 0
+    dfs = dfs[dfs["job_type"] != "product_page"]
+    for groups in dfs.groupby(["job_type", "target_zone_id"]):
+        plots_count+=1
+    fig, axs  = plt.subplots(int(plots_count/3), 3)
+    for groups in dfs.groupby(["job_type", "target_zone_id"]):
+        table_name = groups[0]
+        g_df = groups[1]
+        plots_count-=1
+        w = 1
+        markers = ["h","v","o"]
+        linestyles = ["-","--",":"]
+        alphas = [0.3,0.6, 1]
+        for group in g_df.groupby("load_balance"):
+            name = group[0]
+            df = group[1]
+            y = lfilter(b, a, df["load"].to_list())
+            x = df["arrival_time"].to_list()
+            axs[int(plots_count/3), plots_count%3].plot(x, y, label = name, linewidth=1, linestyle=linestyles[w-1])
+            w+=1
+
+        axs[int(plots_count/3), plots_count%3].set_title(table_name)
+    plt.legend()
+    plt.subplots_adjust(hspace=0.5)
+    plt.show()
+
+def _plot_bars(dfs ,type="mean"):
 
     total_traffic_cost_in_usd = []
     bars_names = []
@@ -11,6 +61,7 @@ def plot(dfs):
     total_jobs_handled = []
     avg_latencies = []
     job_durations = []
+
     for iter, df_type_map in dfs.items():
         bars_names.append([])
         total_traffic_cost_in_usd.append([])
@@ -18,22 +69,35 @@ def plot(dfs):
         total_jobs_handled.append([])
         avg_latencies.append([])
         job_durations.append([])
-        for type, t_dfs in df_type_map.items():
-            bars_names[-1].append(type)
+        for lb_type, t_dfs in df_type_map.items():
+            bars_names[-1].append(lb_type)
             concated_df = pd.concat(t_dfs.values())
             total_traffic_cost_in_usd[-1].append(concated_df["cost_in_usd"].sum())
             total_traffic_sent_in_gb[-1].append(concated_df["size_in_gb"].sum())
             avg_latencies[-1].append(concated_df["zone_dependent_latency"].mean())
             job_durations[-1].append(concated_df["duration"].mean())
             total_jobs_handled[-1].append(len(concated_df.index))
-
-    total_traffic_cost_in_usd = np.mean(total_traffic_cost_in_usd, axis=0)
-    total_traffic_sent_in_gb = np.mean(total_traffic_sent_in_gb, axis=0)
-     # = total_traffic_cost_in_usd/total_traffic_sent_in_gb
-    total_jobs_handled = np.mean(total_jobs_handled, axis=0)
-    avg_latencies = np.mean(avg_latencies, axis=0)
-    job_durations = np.mean(job_durations, axis=0)
-
+    if type == "median":
+        total_traffic_cost_in_usd = np.median(total_traffic_cost_in_usd, axis=0)
+        total_traffic_sent_in_gb = np.median(total_traffic_sent_in_gb, axis=0)
+        total_jobs_handled = np.median(total_jobs_handled, axis=0)
+        avg_latencies = np.median(avg_latencies, axis=0)
+        job_durations = np.median(job_durations, axis=0)
+    elif type == "mean":
+        total_traffic_cost_in_usd = np.mean(total_traffic_cost_in_usd, axis=0)
+        total_traffic_sent_in_gb = np.mean(total_traffic_sent_in_gb, axis=0)
+        total_jobs_handled = np.mean(total_jobs_handled, axis=0)
+        avg_latencies = np.mean(avg_latencies, axis=0)
+        job_durations = np.mean(job_durations, axis=0)
+    elif isinstance(type, float):
+        total_traffic_cost_in_usd = np.quantile(total_traffic_cost_in_usd, type, axis=0)
+        total_traffic_sent_in_gb = np.quantile(total_traffic_sent_in_gb, type, axis=0)
+        total_jobs_handled = np.quantile(total_jobs_handled, type, axis=0)
+        avg_latencies = np.quantile(avg_latencies, type, axis=0)
+        job_durations = np.quantile(job_durations, type, axis=0)
+    else:
+        print("type", type)
+        raise
     title = "Traffic Analysis\n"
     bar_titles = []
     bar_improvments = []
@@ -75,8 +139,10 @@ def plot(dfs):
         line_values.append(simple_max_addative_weight(
             price = avg_price,
             max_price = max_price_per_gb,
+            price_weight=0.5,
             latency = lat,
-            max_latency = max_latency
+            max_latency = max_latency,
+            latency_weight=0.5,
         ))
         line_titles.append("Cost = "+'%.3f' % line_values[-1])
         if i > 0:
@@ -128,6 +194,16 @@ def plot(dfs):
 
         # title=title
     )
+
+def plot_dfs(dfs):
+    types = ["mean"]#, "median",0.9, 0.95, 0.99, ]
+    for app_name, app_testing_dfs in dfs.items():
+        print("app name", app_name)
+        comparisons = _build_comparison_map(app_testing_dfs)
+        _plot_service_loads(comparisons)
+        for type in types:
+            _plot_bars(app_testing_dfs, type=type)
+
 
     # # plot density function
     # import matplotlib.pyplot as plt
