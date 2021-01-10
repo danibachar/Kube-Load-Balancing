@@ -63,7 +63,7 @@ def _dynamic_plots(x_values, x_title, y_values_subsets, y_labels, title):
     label = y_labels[0]
     color = 'tab:red'
     ax1.set_ylabel(label, color=color)
-    ax1.plot(x_values, values, color=color, alpha=0.7,linewidth=5.0)
+    ax1.plot(x_values, values, color=color, alpha=0.7, linewidth=5.0)
     ax1.tick_params(axis='y', labelcolor=color)
 
     colors = ['tab:blue', 'tab:green']
@@ -158,19 +158,19 @@ def bar_plot(
     bars_values=[],
     bar_titles=[],
     bar_improvments=[],
-    bars_title="Total Traffic Pricing",
+    bars_title="Avg Price per GB",#"Total Traffic Pricing",
     bars_y_label="$",
 
     scatter_values=[],
     scatter_titles=[],
     scatter_improvments=[],
-    scatter_title="Avg Latency Per Request",
+    scatter_title="Avg Latency per request",
     scatter_y_label="ms",
 
     line_values=[],
     line_titles=[],
     line_improvments=[],
-    line_title="Total Additive Cost",
+    line_title="Avarage Cost",
     line_y_label="",
 
     job_duration_values=[],
@@ -182,44 +182,52 @@ def bar_plot(
     title=""
 ):
     x = np.arange(len(x_values))  # the label locations
-    fig, axs = plt.subplots(2,2)
+    fig, axs = plt.subplots(4)
     fig.suptitle(title)
 
-    axs[0,0].bar(x, bars_values ,color = 'red')
-    axs[0,0].set_xticks(x)
-    axs[0,0].set_xticklabels(x_values)
-    axs[0,0].set_title(bars_title)
-    axs[0,0].set_ylabel(bars_y_label)
+    axs[0].bar(x, bars_values ,color = 'red')
+    axs[0].set_xticks(x)
+    axs[0].set_xticklabels(x_values)
+    axs[0].set_title(bars_title)
+    axs[0].set_ylabel(bars_y_label)
+    axs[0].set_ylim([0, max(bars_values)*1.25])
 
     for i, value in enumerate(bars_values):
-        text = bar_titles[i]+"\n"+bar_improvments[i]
-        axs[0,0].text(x[i], value-min(bars_values)/2, text, color = 'black', ha='center')
+    #     text = bar_titles[i]+"\n"+bar_improvments[i]
+        axs[0].text(x[i], value, str(round(value,3)), color = 'black', ha='center')
 
-    axs[0,1].bar(x, scatter_values,color = 'blue')
-    axs[0,1].set_xticks(x)
-    axs[0,1].set_xticklabels(x_values)
-    axs[0,1].set_title(scatter_title)
-    axs[0,1].set_ylabel(scatter_y_label)
+    axs[1].bar(x, scatter_values,color = 'blue')
+    axs[1].set_xticks(x)
+    axs[1].set_xticklabels(x_values)
+    axs[1].set_title(scatter_title)
+    axs[1].set_ylabel(scatter_y_label)
+    axs[1].set_ylim([0, max(scatter_values)*1.25])
+
     for i, value in enumerate(scatter_values):
-        text = scatter_titles[i]+"\n"+scatter_improvments[i]
-        axs[0,1].text(x[i], value-min(scatter_values)/2, text, color = 'black', ha='center')
+    #     text = scatter_titles[i]+"\n"+scatter_improvments[i]
+        axs[1].text(x[i], value, str(round(value,3)), color = 'black', ha='center')
 
-    axs[1,0].bar(x, line_values,color = 'green')
-    axs[1,0].set_xticks(x)
-    axs[1,0].set_xticklabels(x_values)
-    axs[1,0].set_title(line_title)
-    axs[1,0].set_ylabel(line_y_label)
-    for i, value in enumerate(line_values):
-        text = line_titles[i]+"\n"+line_improvments[i]
-        axs[1,0].text(x[i], value-min(line_values)/2, text, color = 'black', ha='center')
+    # axs[2].bar(x, line_values,color = 'green')
+    # axs[2].set_xticks(x)
+    # axs[2].set_xticklabels(x_values)
+    # axs[2].set_title(line_title)
+    # axs[2].set_ylabel(line_y_label)
+    # axs[2].set_ylim([0, max(line_values)*1.25])
+    #
+    # for i, value in enumerate(line_values):
+    # #     text = line_titles[i]+"\n"+line_improvments[i]
+    #     axs[2].text(x[i], value, str(round(value,3)), color = 'black', ha='center')
 
-    axs[1,1].bar(x, job_duration_values, color = 'purple')
-    axs[1,1].set_xticks(x)
-    axs[1,1].set_xticklabels(x_values)
-    axs[1,1].set_title(job_duration_title)
-    axs[1,1].set_ylabel(job_duration_y_label)
+    axs[3].bar(x, job_duration_values, color = 'purple')
+    axs[3].set_xticks(x)
+    axs[3].set_xticklabels(x_values)
+    axs[3].set_title(job_duration_title)
+    axs[3].set_ylabel(job_duration_y_label)
+    axs[3].set_ylim([0, max(job_duration_values)*1.25])
     for i, value in enumerate(job_duration_values):
-        text = job_duration_titles[i]+"\n"+job_duration_improvments[i]
-        axs[1,1].text(x[i], value-min(job_duration_values)/2, text, color = 'black', ha='center')
+        # text = job_duration_titles[i]+"\n"+job_duration_improvments[i]
+        axs[3].text(x[i], value, str(round(value,3)), color = 'black', ha='center')
+
+    plt.subplots_adjust(hspace=0.5)
 
     plt.show()

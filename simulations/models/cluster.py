@@ -1,16 +1,17 @@
 import collections, logging, time
 import pandas as pd
 
-consumes_times = []
-
 class Cluster:
     """Representing a Kubernetes Cluster"""
 
     def __init__(self, zone):
         self.zone = zone
-        self.services = {}
+        self.services = collections.OrderedDict()
         self.mesh = collections.OrderedDict()
         self.weights = {}
+
+    def __repr__(self):
+        return self.zone.__repr__()
 
     def __str__(self):
         return str(self.__class__) + ": " + str(self.__dict__)
@@ -59,25 +60,19 @@ class Cluster:
 
         self.weights[job_type][to_zone] = weight
 
-    def clear_pending_jobs(self, tok):
-        for service in self.services:
-            service.clear_pending_jobs(tok)
-
-    def prepare_for_weight_update(self):
+    def prepare_for_weight_update(self, at_tik):
         for service in self.services.values():
-            service.update_df()
+            service.update_df(at_tik)
+
+    def reset_state(self):
+        for service in self.services.values():
+            service.reset_state()
 
     def consume(self, job ,at_tik):
-        global consumes_times
-        # st = time.time()
         job.arrival_time = at_tik
-
-        # logging.debug("cluster:{} consume - {}".format(self.id,job))
+        logging.debug("cluster:{} consume - {}".format(self.id,job))
         srv = self.service(job.type)
         if not srv:
             logging.error("cluster:{}\ncannot consume:{} - not supported service".format(self.id, job))
             return
         srv.consume(job)
-        # print("cluster = {}\nconsumed job {}\nat tik  = {}\nwith ttl = {}".format(self.id, job.type, at_tik, job.ttl))
-        # consumes_times.append("cluster consume job={} took={}".format(job.type,time.time()-st))
-        # print(consumes_times[-1])

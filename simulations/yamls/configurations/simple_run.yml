@@ -1,0 +1,28 @@
+base_config:
+  funcs:
+    RR:
+      weight_calc: round_robin
+    WRR:
+      weight_calc: smooth_weighted_round_robin
+    OURS:
+      weight_calc: model
+  tiks_count: 100
+  rps:  26_000
+  distribution: pareto
+  rounds: 1
+  cost_function:
+    price_weight:
+      - 0.5
+      - 0.8
+      - 0.2
+    latency_weight:
+      - 0.5
+      - 0.2
+      - 0.8
+simulation_ymals:
+  apps:
+      - yamls/application_ymals/bookinfo_api_istio_high_load.yml
+  latency: yamls/latency/full_matrix.yml
+  pricing:
+    - yamls/pricing/aws.yml
+    - yamls/pricing/gcp.yml

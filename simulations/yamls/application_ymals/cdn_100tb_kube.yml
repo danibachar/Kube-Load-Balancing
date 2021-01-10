@@ -1,35 +1,21 @@
 services:
-  product_page:
-    name: product_page
+  image_server:
+    name: image_server
     label: front-end
     dependencies:
-      review1:
-        name: review
-        req_size: 5_000_000
-      details:
-        name: details
-        req_size: 5_000_000
-    expected-outbound-req-size-kb: 5_000_000
-  review:
-    name: review
-    label: internal
-    dependencies:
-      rating:
-        name: rating
-        req_size: 5_000_000
-    expected-outbound-req-size-kb: 5_000_000
-  details:
-    name: details
-    label: internal
-    dependencies: {}
-    expected-outbound-req-size-kb: 5_000_000
-  rating:
-    name: rating
-    label: internal
-    dependencies: {}
-    expected-outbound-req-size-kb: 5_000_000
+      storage:
+        name: storage
+        req_size: 5_000
+    expected-outbound-req-size-kb: 5_000
 
 app-topology:
+  aws-ap-northeast-1:
+  aws-ap-northeast-2:
+  aws-ap-south-1:
+  aws-ap-southeast-1:
+  aws-ap-southeast-2:
+  aws-northamerica-central-1:
+  aws-eu-central-1:
   aws-us-east-1:
     services:
       product_page:
@@ -37,10 +23,10 @@ app-topology:
           rps_capacity: 50
       review:
           name: review
-          rps_capacity: 250
+          rps_capacity: 90
       details:
           name: details
-          rps_capacity: 250
+          rps_capacity: 90
   gcp-us-west-1:
     services:
       product_page:
@@ -48,7 +34,7 @@ app-topology:
           rps_capacity: 50
       rating:
           name: rating
-          rps_capacity: 250
+          rps_capacity: 90
   gcp-eu-west-1:
     services:
       product_page:
@@ -56,13 +42,13 @@ app-topology:
           rps_capacity: 50
       review:
           name: review
-          rps_capacity: 250
+          rps_capacity: 90
       rating:
           name: rating
-          rps_capacity: 250
+          rps_capacity: 90
       details:
           name: details
-          rps_capacity: 250
+          rps_capacity: 90
   aws-sa-east-1:
     services:
       product_page:
@@ -70,7 +56,7 @@ app-topology:
           rps_capacity: 50
       review:
           name: review
-          rps_capacity: 250
+          rps_capacity: 90
   gcp-asia-east-1:
     services:
       product_page:
@@ -78,7 +64,7 @@ app-topology:
           rps_capacity: 50
       details:
           name: details
-          rps_capacity: 250
+          rps_capacity: 90
       rating:
           name: rating
-          rps_capacity: 250
+          rps_capacity: 90

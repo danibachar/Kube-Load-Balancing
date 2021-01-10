@@ -1,13 +1,11 @@
-import models.kube
-from models.kube import CloudProvider, Region, Zone, Cluster, Service, ServiceDependency
+import models
+from models import CloudProvider, Region, Zone, Cluster, Service, ServiceDependency
 
-def generate_application(ymals_map, destination_func, cost_func):
-    latency_map = ymals_map["latency"]
-    pricing_map = ymals_map["pricing"]
-    app_map = ymals_map["app"]
-    special_keys = ymals_map.get("keys", None)
+def generate_application(app_map, latency_map, pricing_map, app_name):
+    clusters = _gen_clusters(app_map, latency_map, pricing_map)
+    for cluster in clusters:
+        cluster.app_name = app_name
 
-    clusters = _gen_clusters(app_map, latency_map, pricing_map, cost_func, destination_func)
     _create_full_cluster_mesh(clusters)
 
     front_end = _get_front_end_name(app_map)
@@ -21,7 +19,7 @@ def _get_front_end_name(app):
             return service["name"]
     return None
 
-def _gen_clusters(app, latency, pricing, cost_func, destination_func):
+def _gen_clusters(app, latency, pricing):
     services_config = app["services"]
     topology = app["app-topology"]
     clusters = []
@@ -31,16 +29,14 @@ def _gen_clusters(app, latency, pricing, cost_func, destination_func):
             zone_cluster_details,
             latency,
             pricing,
-            services_config,
-            cost_func,
-            destination_func
+            services_config
         )
         clusters.append(cluster)
     return clusters
 
-def _gen_cluster(zone_name, zone_cluster_details, latency, pricing, services_config, cost_func, destination_func):
+def _gen_cluster(zone_name, zone_cluster_details, latency, pricing, services_config):
 
-    zone = _gen_zone(zone_name, latency, pricing, cost_func)
+    zone = _gen_zone(zone_name, latency, pricing)
     cluster = Cluster(zone)
 
     available_services = zone_cluster_details["services"]
@@ -48,12 +44,12 @@ def _gen_cluster(zone_name, zone_cluster_details, latency, pricing, services_con
     for service in available_services.values():
         service_name = service["name"]
         service_capacity = service["rps_capacity"]
-        svc = _gen_service(services_config[service_name], service_capacity, destination_func)
+        svc = _gen_service(services_config[service_name], service_capacity)
         cluster.add_service(svc)
 
     return cluster
 
-def _gen_zone(zone_name, latency, pricing, cost_func):
+def _gen_zone(zone_name, latency, pricing):
     supported_cloud_providers = set({"aws", "gcp"})
 
     zone_parts = zone_name.split("-")
@@ -69,11 +65,11 @@ def _gen_zone(zone_name, latency, pricing, cost_func):
     cp = CloudProvider(cp_name)
 
     region = Region("-".join(zone_parts[1:-1]))
-    zone = Zone("1", region, cp, latency, pricing, cost_func)
+    zone = Zone("1", region, cp, latency, pricing[cp_name])
 
     return zone
 
-def _gen_service(service_config, capacity, destination_func):
+def _gen_service(service_config, capacity):
     dependencies = []
     for dep in service_config["dependencies"].values():
         name = dep["name"]
@@ -87,8 +83,7 @@ def _gen_service(service_config, capacity, destination_func):
         job_type=service_name,
         dependencies=dependencies,
         capacity=capacity,
-        expected_outbound_req_size_kb=my_out,
-        dest_func=destination_func
+        expected_outbound_req_size_kb=my_out
     )
     return service
 

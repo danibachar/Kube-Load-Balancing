@@ -1,7 +1,7 @@
 name: gcp
 zones:
   from:
-    all: free
+    all: 0
 regions:
   from:
     US: 0.01

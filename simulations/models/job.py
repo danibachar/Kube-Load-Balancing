@@ -7,7 +7,7 @@ class Job:
         self,
         source_zone,
         target_zone,
-        duration,
+        processing_duration,
         load,
         type,
         data_size_in_kb=0,
@@ -20,7 +20,7 @@ class Job:
         self.source_zone = source_zone
         self.target_zone = target_zone
 
-        self._duration = duration
+        self.processing_duration = processing_duration
         self.load = load
         self.type = type
         self.data_size_in_kb = data_size_in_kb
@@ -38,8 +38,9 @@ class Job:
 
     @property
     def duration(self):
-        return max([pj.duration for pj in self.propogated_jobs] + [0]) + self._duration
+        max_dependency_duration = max([pj.duration for pj in self.propogated_jobs] + [0])
+        return max_dependency_duration + self.processing_duration + self.zone_dependent_latency
 
     @property
     def ttl(self):
-        return self.arrival_time + self.duration
+        return self.arrival_time + self.duration - self.zone_dependent_latency
