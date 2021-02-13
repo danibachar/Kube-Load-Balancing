@@ -4,6 +4,7 @@ def _build_simulation_ymals(simulation_ymals_config):
     pricing_ymal_list = simulation_ymals_config["pricing"]
     app_ymal_list = simulation_ymals_config["apps"]
     latency_ymal = simulation_ymals_config["latency"]
+    datacenters_yml = simulation_ymals_config["datacenters_locations"]
 
     pricing_ymal = {}
     for file_name in pricing_ymal_list:
@@ -18,7 +19,8 @@ def _build_simulation_ymals(simulation_ymals_config):
     ymals = {
         "apps": app_ymal,
         "latency": load_ymal(latency_ymal),
-        "pricing": pricing_ymal
+        "pricing": pricing_ymal,
+        "datacenters_locations": load_ymal(datacenters_yml)
     }
     return ymals
 

@@ -15,13 +15,19 @@ base_config:
       - 0.5
       - 0.8
       - 0.2
+      - 0.95
+      - 0.05
     latency_weight:
       - 0.5
       - 0.2
       - 0.8
+      - 0.05
+      - 0.95
 simulation_ymals:
   apps:
-      - yamls/application_ymals/bookinfo_api_istio_high_load.yml
+      # - yamls/application_ymals/bookinfo_api_istio.yml
+      # - yamls/application_ymals/cdn_kube.yml
+      - yamls/application_ymals/simple_image_data_pipeline_kube.yml
   latency: yamls/latency/full_matrix.yml
   pricing:
     - yamls/pricing/aws.yml

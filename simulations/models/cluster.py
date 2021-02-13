@@ -53,17 +53,7 @@ class Cluster:
         if service is None:
             return -1 # incating no support at all
         return service.residual_capacity(at_tik)
-
-    def update_weight_for(self, job_type, to_zone, weight):
-        if job_type not in self.weights:
-            self.weights[job_type] = {}
-
-        self.weights[job_type][to_zone] = weight
-
-    def prepare_for_weight_update(self, at_tik):
-        for service in self.services.values():
-            service.update_df(at_tik)
-
+        
     def reset_state(self):
         for service in self.services.values():
             service.reset_state()

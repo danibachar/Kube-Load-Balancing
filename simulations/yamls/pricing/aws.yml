@@ -18,9 +18,19 @@ worldwide:
           40TB: 0.085
           100TB: 0.07
           150TB: 0.05
+        OCEANIA:
+          10TB: 0.09
+          40TB: 0.085
+          100TB: 0.07
+          150TB: 0.05
     EU:
       to:
         MOST:
+          10TB: 0.09
+          40TB: 0.085
+          100TB: 0.07
+          150TB: 0.05
+        OCEANIA:
           10TB: 0.09
           40TB: 0.085
           100TB: 0.07
@@ -32,6 +42,11 @@ worldwide:
           40TB: 0.085
           100TB: 0.082
           150TB: 0.08
+        OCEANIA:
+          10TB: 0.12
+          40TB: 0.085
+          100TB: 0.082
+          150TB: 0.08
     AP-NORTHEAST:
       to:
         MOST:
@@ -39,6 +54,11 @@ worldwide:
           40TB: 0.089
           100TB: 0.086
           150TB: 0.084
+        OCEANIA:
+          10TB: 0.154
+          40TB: 0.147
+          100TB: 0.126
+          150TB: 0.112
     OCEANIA:
       to:
         MOST:
@@ -46,6 +66,11 @@ worldwide:
           40TB: 0.098
           100TB: 0.094
           150TB: 0.092
+        OCEANIA:
+          10TB: 0.154
+          40TB: 0.147
+          100TB: 0.126
+          150TB: 0.112
     AP-SOUTH:
       to:
         MOST:
@@ -53,6 +78,11 @@ worldwide:
           40TB: 0.085
           100TB: 0.082
           150TB: 0.08
+        OCEANIA:
+          10TB: 0.154
+          40TB: 0.147
+          100TB: 0.126
+          150TB: 0.112
     SA:
       to:
         MOST:
@@ -60,9 +90,19 @@ worldwide:
           40TB: 0.138
           100TB: 0.126
           150TB: 0.114
+        OCEANIA:
+          10TB: 0.154
+          40TB: 0.147
+          100TB: 0.126
+          150TB: 0.112
     AF:
       to:
         MOST:
+          10TB: 0.154
+          40TB: 0.147
+          100TB: 0.126
+          150TB: 0.112
+        OCEANIA:
           10TB: 0.154
           40TB: 0.147
           100TB: 0.126

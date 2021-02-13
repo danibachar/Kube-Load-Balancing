@@ -182,7 +182,7 @@ def bar_plot(
     title=""
 ):
     x = np.arange(len(x_values))  # the label locations
-    fig, axs = plt.subplots(4)
+    fig, axs = plt.subplots(3)
     fig.suptitle(title)
 
     axs[0].bar(x, bars_values ,color = 'red')
@@ -218,15 +218,15 @@ def bar_plot(
     # #     text = line_titles[i]+"\n"+line_improvments[i]
     #     axs[2].text(x[i], value, str(round(value,3)), color = 'black', ha='center')
 
-    axs[3].bar(x, job_duration_values, color = 'purple')
-    axs[3].set_xticks(x)
-    axs[3].set_xticklabels(x_values)
-    axs[3].set_title(job_duration_title)
-    axs[3].set_ylabel(job_duration_y_label)
-    axs[3].set_ylim([0, max(job_duration_values)*1.25])
+    axs[2].bar(x, job_duration_values, color = 'purple')
+    axs[2].set_xticks(x)
+    axs[2].set_xticklabels(x_values)
+    axs[2].set_title(job_duration_title)
+    axs[2].set_ylabel(job_duration_y_label)
+    axs[2].set_ylim([0, max(job_duration_values)*1.25])
     for i, value in enumerate(job_duration_values):
         # text = job_duration_titles[i]+"\n"+job_duration_improvments[i]
-        axs[3].text(x[i], value, str(round(value,3)), color = 'black', ha='center')
+        axs[2].text(x[i], value, str(round(value,3)), color = 'black', ha='center')
 
     plt.subplots_adjust(hspace=0.5)
 

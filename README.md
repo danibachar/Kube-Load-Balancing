@@ -43,3 +43,10 @@ Bin covering - like bin packing but with finite bin count
   - https://medium.com/@sachinkagarwal/public-cloud-inter-region-network-latency-as-heat-maps-134e22a5ff19
   - https://pc.nanog.org/static/published/meetings/NANOG75/1909/20190218_Kesavan_Comparing_The_Network_v1.pdf
   - https://www.cockroachlabs.com/blog/aws-azure-gcp-respond-to-the-2020-cloud-report/
+
+
+## YMAL Resources:
+
+- datacenters.yml:
+  - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
+  - https://cloud.google.com/compute/docs/regions-zones

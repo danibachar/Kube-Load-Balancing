@@ -3,7 +3,7 @@ services:
     name: product_page
     label: front-end
     dependencies:
-      review1:
+      review:
         name: review
         req_size: 50
       details:
@@ -34,51 +34,51 @@ app-topology:
     services:
       product_page:
           name: product_page
-          rps_capacity: 50
+          rps_capacity: 30_000
       review:
           name: review
-          rps_capacity: 90
+          rps_capacity: 50_000
       details:
           name: details
-          rps_capacity: 90
+          rps_capacity: 50_000
   gcp-us-west-1:
     services:
       product_page:
           name: product_page
-          rps_capacity: 50
+          rps_capacity: 30_000
       rating:
           name: rating
-          rps_capacity: 90
+          rps_capacity: 50_000
   gcp-eu-west-1:
     services:
       product_page:
           name: product_page
-          rps_capacity: 50
+          rps_capacity: 30_000
       review:
           name: review
-          rps_capacity: 90
+          rps_capacity: 50_000
       rating:
           name: rating
-          rps_capacity: 90
+          rps_capacity: 50_000
       details:
           name: details
-          rps_capacity: 90
+          rps_capacity: 50_000
   aws-sa-east-1:
     services:
       product_page:
           name: product_page
-          rps_capacity: 50
+          rps_capacity: 30_000
       review:
           name: review
-          rps_capacity: 90
+          rps_capacity: 50_000
   gcp-asia-east-1:
     services:
       product_page:
           name: product_page
-          rps_capacity: 50
+          rps_capacity: 30_000
       details:
           name: details
-          rps_capacity: 90
+          rps_capacity: 50_000
       rating:
           name: rating
-          rps_capacity: 90
+          rps_capacity: 50_000

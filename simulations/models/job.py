@@ -11,7 +11,7 @@ class Job:
         load,
         type,
         data_size_in_kb=0,
-        zone_dependent_latency=0,
+        latency=0,
         work_latency=0,
         source_job=None,
     ):
@@ -25,7 +25,7 @@ class Job:
         self.type = type
         self.data_size_in_kb = data_size_in_kb
 
-        self.zone_dependent_latency = zone_dependent_latency
+        self.latency = latency
         self.work_latency = work_latency
 
         self.source_job = source_job
@@ -36,11 +36,16 @@ class Job:
     def __str__(self):
         return str(self.__class__) + ": " + str(self.__dict__)
 
+    def __repr__(self):
+        if self.source_zone:
+            return "{} -> {} = {}".format(self.source_zone.__repr__(), self.target_zone.__repr__(), self.load)
+        return "-> {} = {}".format(self.target_zone.__repr__(), self.load)
+
     @property
     def duration(self):
         max_dependency_duration = max([pj.duration for pj in self.propogated_jobs] + [0])
-        return max_dependency_duration + self.processing_duration + self.zone_dependent_latency
+        return max_dependency_duration + self.processing_duration + self.latency
 
     @property
     def ttl(self):
-        return self.arrival_time + self.duration - self.zone_dependent_latency
+        return self.arrival_time + self.duration - self.latency

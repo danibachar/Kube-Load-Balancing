@@ -10,7 +10,7 @@ class Zone:
         self.latency = _generate_latency_map_for_zone(latency, self)
         self.pricing = pricing
 
-        logging.debug("latency: {} -> {}".format(self.full_name, self.latency))
+        logging.debug("latency: {} -> {}".format(self.name, self.latency))
         logging.debug("pricing:{}".format(self.pricing))
 
     def __str__(self):
@@ -34,10 +34,14 @@ class Zone:
     def full_name(self):
         return "-".join([self.name, self.id])
 
+    @property
+    def location(self):
+        return self.region.location
+
     def price_per_gb(self, other_zone):
         if other_zone is None:
             return 0.15
-        # return  self.pricing[self.full_name][other_zone.full_name]
+        # return  self.pricing[self.name][other_zone.name]
 
         logging.debug("checking price from:{} <-> to:{}".format(self.name, other_zone.name))
 
@@ -61,10 +65,10 @@ class Zone:
         return self.pricing["worldwide"]["from"][f]["to"][t]["10TB"]
 
     def latency_per_request(self, other_zone):
-        logging.debug("checking latency from:{} <-> to:{}".format(self.full_name, other_zone.full_name))
-        if other_zone.full_name not in self.latency:
+        logging.debug("checking latency from:{} <-> to:{}".format(self.name, other_zone.name))
+        if other_zone.name not in self.latency:
             raise
-        latency = self.latency.get(other_zone.full_name, 0)
+        latency = self.latency.get(other_zone.name, 0)
         return latency
 
 class CloudProvider:
@@ -86,8 +90,9 @@ class CloudProvider:
 class Region:
     """Representing a Cloud Provider's Region"""
 
-    def __init__(self, id):
+    def __init__(self, id, location):
         self.id = id
+        self.location = location
 
     def __str__(self):
         return str(self.__class__) + ": " + str(self.__dict__)
@@ -96,7 +101,7 @@ class Region:
         return hash(self.id)
 
     def __eq__(self,other):
-        return self.id == other.id
+        return self.id == other.id and self.location == other.location
 
 def _generate_latency_map_for_zone(latencies, zone):
     my_index = _latency_index_for(latencies, zone)
@@ -105,7 +110,7 @@ def _generate_latency_map_for_zone(latencies, zone):
     if my_index >= len(latencies):
         raise
     _map = {}
-    latencies_from_me_to_others = latencies[my_index][zone.full_name]
+    latencies_from_me_to_others = latencies[my_index][zone.name]
     for other_zone_idx in range(len(latencies_from_me_to_others)):
         other_zone_map = latencies[other_zone_idx]
         zone_name = list(other_zone_map.keys())
@@ -119,52 +124,10 @@ def _generate_latency_map_for_zone(latencies, zone):
 
 def _latency_index_for(latency_matrix, zone):
     for idx, latency_map in enumerate(latency_matrix):
-        if zone.full_name in latency_map:
+        if zone.name in latency_map:
             return idx
     return -1
 
-
-def _generate_pricing_map_for_zone(pricing, zone):
-    cloud_provider_map = pricing[zone.cloud_provider.id]
-    # print(cloud_provider_map)
-
-    return {
-        "aws-us-east-1": {
-            "aws-us-east-1": 0.01,
-            "aws-sa-east-1": 0.09,
-            "gcp-us-west-1": 0.09,
-            "gcp-eu-west-1": 0.09,
-            "gcp-asia-east-1": 0.09,
-        },
-        "aws-sa-east-1": {
-            "aws-us-east-1": 0.138,
-            "aws-sa-east-1": 0.01,
-            "gcp-us-west-1": 0.15,
-            "gcp-eu-west-1": 0.15,
-            "gcp-asia-east-1": 0.15,
-        },
-        "gcp-us-west-1": {
-            "aws-us-east-1": 0.12,
-            "aws-sa-east-1": 0.12,
-            "gcp-us-west-1": 0.0,
-            "gcp-eu-west-1": 0.08,
-            "gcp-asia-east-1": 0.08,
-        },
-        "gcp-eu-west-1": {
-            "aws-us-east-1": 0.12,
-            "aws-sa-east-1": 0.12,
-            "gcp-us-west-1": 0.02,
-            "gcp-eu-west-1": 0.0,
-            "gcp-asia-east-1": 0.02,
-        },
-        "gcp-asia-east-1": {
-            "aws-us-east-1": 0.12,
-            "aws-sa-east-1": 0.12,
-            "gcp-us-west-1": 0.08,
-            "gcp-eu-west-1": 0.08,
-            "gcp-asia-east-1": 0.0,
-        },
-    }
 def _region_key(source_region):
     if any(ext in source_region.id for ext in ["us", "america", "canada"]):
         return "US"
@@ -179,7 +142,7 @@ def _region_key(source_region):
     raise
 
 def _cross_regions_key(source_region):
-    if any(ext in source_region.id for ext in ["ap-southeast-1", "australia", "sydney"]):
+    if any(ext in source_region.id for ext in ["ap-southeast-2", "australia", "sydney"]):
         return "OCEANIA"
     return "MOST"
 
@@ -193,7 +156,7 @@ def _world_wide_from_to_keys(source_region, target_region):
         return "AP-NORTHEAST", _cross_regions_key(target_region)
     if any(ext in source_region.id for ext in ["ap", "asia"]):
         return "AP-SOUTH", _cross_regions_key(target_region)
-    if any(ext in source_region.id for ext in ["ap-southeast-1", "australia", "sydney"]):
+    if any(ext in source_region.id for ext in ["ap-southeast-2", "australia", "sydney"]):
         return "OCEANIA", "MOST"
     if any(ext in source_region.id for ext in ["ap", "asia"]):
         return "AP-EAST", _cross_regions_key(target_region)

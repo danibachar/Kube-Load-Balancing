@@ -1,3 +1,5 @@
+# Data Pipeline - Data-lake (storage) -> Queueing system (kafka/etc) -> Perparation/COmputation (Spark/StreamRunners/simple lambda/Model Training) -> Data Warehouse (ElasticeSearch/Dynamo/Dbs/Tabelu) -> API/Applications
+
 services:
   product_page:
     name: product_page
