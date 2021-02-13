@@ -6,29 +6,31 @@ base_config:
       weight_calc: smooth_weighted_round_robin
     OURS:
       weight_calc: model
-  tiks_count: 100
+  tiks_count: 200
   rps:  26_000
   distribution: pareto
   rounds: 1
   cost_function:
     price_weight:
       - 0.5
-      - 0.8
-      - 0.2
-      - 0.95
-      - 0.05
+      - 1.0
+      - 0.0
     latency_weight:
       - 0.5
-      - 0.2
-      - 0.8
-      - 0.05
-      - 0.95
+      - 0.0
+      - 1.0
 simulation_ymals:
   apps:
-      # - yamls/application_ymals/bookinfo_api_istio.yml
-      # - yamls/application_ymals/cdn_kube.yml
-      - yamls/application_ymals/simple_image_data_pipeline_kube.yml
+      - yamls/application_ymals/bookinfo_api_istio_worldwide.yml
+      - yamls/application_ymals/bookinfo_api_istio_asia_eu_dep.yml
+      - yamls/application_ymals/bookinfo_api_istio_america.yml
+      - yamls/application_ymals/cdn_kube_multi_storge.yml
+      - yamls/application_ymals/cdn_kube_few_storage.yml
+      - yamls/application_ymals/cdn_kube_video_stream.yml
+      - yamls/application_ymals/game_and_chat_app_worldwide.yml
+      - yamls/application_ymals/image_data_pipeline_kube.yml
   latency: yamls/latency/full_matrix.yml
   pricing:
     - yamls/pricing/aws.yml
     - yamls/pricing/gcp.yml
+  datacenters_locations: yamls/datacenters.yml
