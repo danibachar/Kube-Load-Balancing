@@ -1,0 +1,174 @@
+aws-ap-northeast-1: # Tokyo
+  name: aws-ap-northeast-1
+  location:
+    lon: 139.7690
+    lat: 35.6804
+  cloud_provider: AWS
+aws-ap-northeast-2: # Seoul
+  name: aws-ap-northeast-2
+  location:
+    lon: 126.9780
+    lat: 37.5665
+  cloud_provider: AWS
+aws-ap-south-1: # Mumbai
+  name: aws-ap-south-1
+  location:
+    lon: 72.8777
+    lat: 19.0760
+  cloud_provider: AWS
+aws-ap-southeast-1: # Singapore
+  name: aws-ap-southeast-1
+  location:
+    lon: 103.8198
+    lat: 1.3521
+  cloud_provider: AWS
+aws-ap-southeast-2: # Sydney
+  name: aws-ap-southeast-2
+  location:
+    lon: 151.2093
+    lat: -33.8688
+  cloud_provider: AWS
+aws-northamerica-central-1: # Ohio
+  name: aws-northamerica-central-1
+  location:
+    lon: -82.9071
+    lat: 40.4173
+  cloud_provider: AWS
+aws-eu-central-1: # Frankfurt
+  name: aws-eu-central-1
+  location:
+    lon: 8.6821
+    lat: 50.1109
+  cloud_provider: AWS
+aws-eu-west-1: # Ireland
+  name: aws-eu-west-1
+  location:
+    lon: 7.6921
+    lat: 53.1424
+  cloud_provider: AWS
+aws-eu-west-2: # London
+  name: aws-eu-west-2
+  location:
+    lon: 0.1278
+    lat: 51.5074
+  cloud_provider: AWS
+aws-eu-west-3: # Paris
+  name: aws-eu-west-3
+  location:
+    lon: 2.3522
+    lat: 48.8566
+  cloud_provider: AWS
+aws-sa-east-1: # São Paulo
+  name: aws-sa-east-1
+  location:
+    lon: -46.6333
+    lat: -23.5505
+  cloud_provider: AWS
+aws-us-east-1: # N. Virginia
+  name: aws-us-east-1
+  location:
+    lon: -78.024902
+    lat: 37.926868
+  cloud_provider: AWS
+aws-us-east-2: # ?????????
+  name: aws-us-east-2
+  location:
+    lon: -82.9071
+    lat: 40.4173
+  cloud_provider: AWS
+aws-us-west-1: # N California
+  name: aws-us-west-1
+  location:
+    lon: -119.4179
+    lat: 36.7783
+  cloud_provider: AWS
+aws-us-west-2: # Oregon
+  name: aws-us-west-2
+  location:
+    lon: -120.5542
+    lat: 43.8041
+  cloud_provider: AWS
+gcp-us-west-1: # Oregon
+  name: gcp-us-west-1
+  location:
+    lon: -120.5542
+    lat: 43.8041
+  cloud_provider: GCP
+gcp-us-east-4: # N. Virginia
+  name: gcp-us-east-4
+  location:
+    lon: -78.024902
+    lat: 37.926868
+  cloud_provider: GCP
+gcp-us-east-1: # Moncks Corner, South Carolina
+  name: gcp-us-east-1
+  location:
+    lon: -80.0131
+    lat: 33.1960
+  cloud_provider: GCP
+gcp-us-central-1: # Council Bluffs, Iowa
+  name: gcp-us-central-1
+  location:
+    lon: -95.8608
+    lat: 41.2619
+  cloud_provider: GCP
+gcp-sa-east-1: # São Paulo
+  name: gcp-sa-east-1
+  location:
+    lon: -46.6333
+    lat: -23.5505
+  cloud_provider: GCP
+gcp-northamerica-northeast-1: # Montréal, Québec
+  name: gcp-northamerica-northeast-1
+  location:
+    lon: -73.5673
+    lat: 45.5017
+  cloud_provider: GCP
+gcp-eu-west-4: # Eemshaven, Netherland
+  name: gcp-eu-west-4
+  location:
+    lon: 6.8355
+    lat: 53.4386
+  cloud_provider: GCP
+gcp-eu-west-3: # Frankfurt, Germany
+  name: gcp-eu-west-3
+  location:
+    lon: 8.6821
+    lat: 50.1109
+  cloud_provider: GCP
+gcp-eu-west-2: # London
+  name: gcp-eu-west-2
+  location:
+    lon: 0.1278
+    lat: 51.5074
+  cloud_provider: GCP
+gcp-eu-west-1: # St. Ghislain, Belgium
+  name: gcp-eu-west-1
+  location:
+    lon: 3.8184
+    lat: 50.4491
+  cloud_provider: GCP
+gcp-asia-southeast-1: # Singapore
+  name: gcp-asia-southeast-1
+  location:
+    lon: 103.8198
+    lat: 1.3521
+  cloud_provider: GCP
+gcp-asia-south-1: # Mumbai
+  name: gcp-asia-south-1
+  location:
+    lon: 72.8777
+    lat: 19.0760
+  cloud_provider: GCP
+gcp-asia-northeast-1: # Tokyo
+  name: gcp-asia-northeast-1
+  location:
+    lon: 139.7690
+    lat: 35.6804
+  cloud_provider: GCP
+gcp-asia-east-1: # Changhua County, Taiwan
+  name: gcp-asia-east-1
+  location:
+    lon: 120.5161
+    lat: 24.0518
+  cloud_provider: GCP

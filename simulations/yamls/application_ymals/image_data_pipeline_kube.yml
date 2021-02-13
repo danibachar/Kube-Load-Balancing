@@ -1,0 +1,150 @@
+# Data Pipeline - Data-lake (storage) -> Queueing system (kafka/etc) -> Perparation/COmputation (Spark/StreamRunners/simple lambda/Model Training) -> Data Warehouse (ElasticeSearch/Dynamo/Dbs/Tabelu) -> API/Applications
+
+services:
+  data_puller:
+    name: data_puller # This is the entry point of the pipeline, its an abstruction aboe what actually pushes/pulls the data into the pipeline
+    label: front-end
+    expected-outbound-req-size-kb: 0
+    dependencies:
+      pub_sub_stream:
+        name: pub_sub_stream
+        req_size: 500
+  pub_sub_stream:
+    name: pub_sub_stream
+    label: internal
+    expected-outbound-req-size-kb: 0
+    dependencies:
+      data_extractor:
+        name: data_extractor
+        req_size: 500
+  data_extractor:
+    name: data_extractor
+    label: internal
+    expected-outbound-req-size-kb: 0
+    dependencies:
+      data_cleaner:
+        name: data_cleaner
+        req_size: 500
+  data_cleaner:
+    name: data_cleaner
+    label: internal
+    expected-outbound-req-size-kb: 0
+    dependencies:
+      data_normalizer:
+        name: data_normalizer
+        req_size: 500
+      storage_artifacts:
+        name: storage_artifacts
+        req_size: 10_000
+  data_normalizer:
+    name: data_normalizer
+    label: internal
+    expected-outbound-req-size-kb: 0
+    dependencies:
+      model_trainer:
+        name: model_trainer
+        req_size: 500
+      storage_artifacts:
+        name: storage_artifacts
+        req_size: 10_000
+  model_trainer:
+    name: model_trainer
+    label: internal
+    expected-outbound-req-size-kb: 0
+    dependencies:
+      model_evaluator:
+        name: model_evaluator
+        req_size: 500
+      storage_artifacts:
+        name: storage_artifacts
+        req_size: 10_000
+      storage_images:
+        name: storage_images
+        req_size: 5000
+  model_evaluator:
+    name: model_evaluator
+    label: internal
+    expected-outbound-req-size-kb: 0
+    dependencies:
+      storage_model:
+        name: storage_model
+        req_size: 50_000
+      storage_artifacts:
+        name: storage_artifacts
+        req_size: 10_000
+      db_elastic:
+        name: db_elastic
+        req_size: 500
+      db_sql:
+        name: db_sql
+        req_size: 500
+  storage_model:
+    name: storage_model
+    label: internal
+    expected-outbound-req-size-kb: 500
+    dependencies: {}
+  storage_artifacts:
+    name: storage_artifacts
+    label: internal
+    expected-outbound-req-size-kb: 500
+    dependencies: {}
+  storage_images:
+    name: storage_images
+    label: internal
+    dependencies: {}
+    expected-outbound-req-size-kb: 5_000
+  db_elastic:
+    name: db_elastic
+    label: internal
+    dependencies: {}
+    expected-outbound-req-size-kb: 5000
+  db_sql:
+    name: db_sql
+    label: internal
+    dependencies: {}
+    expected-outbound-req-size-kb: 5000
+
+app-topology:
+  aws-eu-central-1:
+    services:
+      data_puller:
+          name: data_puller
+          rps_capacity: 30_000
+  aws-us-east-1:
+    services:
+      data_puller:
+          name: data_puller
+          rps_capacity: 30_000
+      pub_sub_stream:
+          name: pub_sub_stream
+          rps_capacity: 65_000
+      data_extractor:
+          name: data_extractor
+          rps_capacity: 65_000
+      data_cleaner:
+          name: data_cleaner
+          rps_capacity: 65_000
+      data_normalizer:
+          name: data_normalizer
+          rps_capacity: 65_000
+      model_trainer:
+          name: model_trainer
+          rps_capacity: 65_000
+      model_evaluator:
+          name: model_evaluator
+          rps_capacity: 65_000
+      storage_images:
+          name: storage_images
+          rps_capacity: 65_000
+      storage_model:
+          name: storage_model
+          rps_capacity: 65_000
+      storage_artifacts:
+          name: storage_artifacts
+          rps_capacity: 280_000
+      db_elastic:
+          name: db_elastic
+          rps_capacity: 65_000
+      db_sql:
+          name: db_sql
+          rps_capacity: 65_000
