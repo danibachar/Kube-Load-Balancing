@@ -11,6 +11,7 @@ app = create_dash(server)
 
 # Push an application context so we can use Flask's 'current_app'
 with server.app_context():
+    print("crack")
     # load the rest of our Dash app
     from . import index
 

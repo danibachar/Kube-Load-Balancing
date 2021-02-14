@@ -1,17 +1,12 @@
 FROM python:3.6
 
 ENV DASH_DEBUG_MODE True
-COPY ./ ./main.csv
+COPY ./ ./app
+COPY ./app ./main.csv
 
-COPY ./ ./
+COPY ./app ./
+WORKDIR ./app
 RUN set -ex && \
     pip install -e .
 
-
 ENV DATAFRAME_NAME='/main.csv'
-
-RUN pwd
-RUN ls
-
-EXPOSE 8050
-CMD ["run-kubernetes_servcice_selection-dev"]

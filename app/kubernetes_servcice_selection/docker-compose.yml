@@ -1,0 +1,9 @@
+version: "3.3"
+services:
+  dash:
+    # build: .
+    image: "dash"
+    ports:
+      - "8050:8050"
+      - "8080:8080"
+      - "8000:8000"

@@ -8,6 +8,7 @@ from dash.dependencies import Input, State, Output
 import dash_pivottable
 
 from ..app import app
+from ..utils import get_df, load_balancing_options, app_options, cached_latest_app_secetion
 
 # import dash
 # import dash_core_components as dcc
@@ -20,36 +21,43 @@ import numpy as np
 
 
 
-df_cache = pd.read_csv("~/Documents/IDC/Kube-Load-Balancing/simulations/run_csv/main.csv")
-did_add_custom_cols = False
-
-load_balancing_options = list(df_cache["load_balance"].unique())
-app_options = df_cache["app"].unique()
-cached_latest_app_secetion = app_options[0]
-
-def get_df(app_name=None, balance_namee=None):
-    df = df_cache
-    if df is None:
-        cache_df = pd.read_csv("~/Documents/IDC/Kube-Load-Balancing/simulations/run_csv/main.csv")
-        df = cache_df
-
-    if not did_add_custom_cols:
-        df["gb_price"] = df["cost_in_usd"] / df["size_in_gb"]
-        df["total_cost"] = df["cost_in_usd"] * df["size_in_gb"]
-        did_add_custom_cols = True
-
-    if app_name in app_options:
-        df = df[df["app"] == app_name]
-        cached_latest_app_secetion = df
-    elif cached_latest_app_secetion in app_option:
-        df = df[df["app"] == cached_latest_app_secetion]
-
-    if balance_name in load_balancing_options:
-        df = df[df["load_balance"] == balance_option]
-
-    return df
+# df_cache = pd.read_csv("~/Documents/IDC/Kube-Load-Balancing/simulations/run_csv/main.csv")
+# did_add_custom_cols = False
+#
+# load_balancing_options = list(df_cache["load_balance"].unique())
+# app_options = df_cache["app"].unique()
+# cached_latest_app_secetion = app_options[0]
+#
+# def get_df(app_name=None, balance_namee=None):
+#     global did_add_custom_cols
+#     global df_cache
+#     global cached_latest_app_secetion
+#     global app_options
+#     global load_balancing_options
+#
+#     df = df_cache
+#     if df is None:
+#         cache_df = pd.read_csv("~/Documents/IDC/Kube-Load-Balancing/simulations/run_csv/main.csv")
+#         df = cache_df
+#
+#     if not did_add_custom_cols:
+#         df["gb_price"] = df["cost_in_usd"] / df["size_in_gb"]
+#         df["total_cost"] = df["cost_in_usd"] * df["size_in_gb"]
+#         did_add_custom_cols = True
+#
+#     if app_name in app_options:
+#         df = df[df["app"] == app_name]
+#         cached_latest_app_secetion = df
+#     elif cached_latest_app_secetion in app_option:
+#         df = df[df["app"] == cached_latest_app_secetion]
+#
+#     if balance_name in load_balancing_options:
+#         df = df[df["load_balance"] == balance_option]
+#
+#     return df
 
 def get_layout(**kwargs):
+    print("########")
     return html.Div(
         [
             dcc.Markdown(
@@ -116,7 +124,6 @@ def map_callback(app_option):
     [],  # States
 )
 def callback(balance_option, app_option):
-
     df = get_df(app_name=app_option, balance_name=balance_option)
 
     values_cols = ["duration", "latency", "gb_price", ] #"load"
@@ -144,10 +151,12 @@ def pivot_table():
     p = pd.pivot_table(
         df,
         index=["load_balance","cost_mix", "job_type", "arrival_time","cluster_name"], #[]"cost_mix", "job_type"
-        values=["total_cost", "latency","gb_price", "load"], #vals,#"latency","gb_price", "duration"
+        values=["latency","gb_price", "load", "cost_in_usd", "size_in_gb"], #vals,#"latency","gb_price", "duration"
         # columns=special_cols,/
         aggfunc={
-                "total_cost": sum,
+                # "total_cost": sum,
+                "cost_in_usd": sum,
+                "size_in_gb": sum,
                 "load": sum,
                 "latency": np.mean,
                 "gb_price": np.mean,
@@ -166,5 +175,5 @@ def pivot_table():
                     data=flat_p,
                     cols=["load_balance"],
                     rows=["cost_mix"],
-                    vals=["price_gb"]
+                    vals=["gb_price"]
                 )

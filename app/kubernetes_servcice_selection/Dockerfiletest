@@ -1,13 +1,8 @@
-FROM python:3.6
+FROM dashbase
 
 ENV DASH_DEBUG_MODE True
-COPY ./ ./main.csv
-
-COPY ./ ./
-RUN set -ex && \
-    pip install -e .
-
-
+COPY ./app ./app
+WORKDIR ./app
 ENV DATAFRAME_NAME='/main.csv'
 
 RUN pwd

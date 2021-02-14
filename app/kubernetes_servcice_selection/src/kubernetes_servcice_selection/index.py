@@ -2,7 +2,7 @@ import dash_html_components as html
 
 from .app import app
 from .utils import DashRouter, DashNavBar
-from .pages import character_counter, page2, page3
+from .pages import kube_sim, page2, page3
 from .components import fa
 
 
@@ -10,8 +10,8 @@ from .components import fa
 # string corresponding to path of the route (will be prefixed with Dash's
 # 'routes_pathname_prefix' and 'layout' is a Dash Component.
 urls = (
-    ("", character_counter.get_layout),
-    ("kube-sim", character_counter.get_layout),
+    ("", kube_sim.get_layout),
+    ("kube-sim", kube_sim.get_layout),
     ("page2", page2.layout),
     ("page3", page3.layout),
 )
@@ -25,6 +25,6 @@ nav_items = (
     ("page2", html.Div([fa("fas fa-chart-area"), "Page 2"])),
     ("page3", html.Div([fa("fas fa-chart-line"), "Page 3"])),
 )
-
+print("from index")
 router = DashRouter(app, urls)
 navbar = DashNavBar(app, nav_items)
