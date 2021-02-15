@@ -1,0 +1,17 @@
+- name: Heroku Docker Container Deploy
+  # You may pin to the exact commit or the version.
+  # uses: lucassarcanjo/heroku-deploy@1db4c62f6032efe526c12734f18d36669218e5af
+  uses: lucassarcanjo/heroku-deploy@2.1.17
+  with:
+    # Email Linked to your Heroku Account
+    email: danibachar89@gmail.com
+    # Heroku Dyno Formation
+    formation: # optional, default is web
+    # Your Heroku API Key
+    api_key: 771ebfb9-54b2-4216-98ca-57df1856260a
+    # Your Heroku App Name
+    app_name: kube-opt-dash
+    # Dokerfile path
+    dockerfile_path: ./Dockerfile
+    # Optional build parameters
+    options: # optional
