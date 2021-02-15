@@ -1,6 +1,7 @@
 """Click command line script for running the development webserver."""
 
 import click
+import os
 
 from .app import app
 
@@ -30,4 +31,6 @@ from .app import app
     help="Toggles whether the Dash app is run in debug mode. Defaults to True",
 )
 def main(port, host, debug):
-    app.run_server(port=port, debug=debug, host=host)
+    overrided_port = os.environ.get('PORT', port)
+    print("###overrided_port###\n{}".format(overrided_port))
+    app.run_server(port=overrided_port, debug=overrided_port, host=host)
