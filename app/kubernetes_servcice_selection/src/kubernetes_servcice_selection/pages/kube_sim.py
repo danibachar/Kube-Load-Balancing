@@ -38,7 +38,13 @@ def get_layout(**kwargs):
                 } for i in app_options],
                 value=cached_latest_app_secetion
             ),
-            dcc.Graph(id="map"),
+            dcc.Loading(
+                id = "loading-icon",
+                type="circle",
+                children=[html.Div(dcc.Graph(id="map"))]
+            ),
+
+            # dcc.Graph(id="map", animate=True),
             dcc.Dropdown(
                 id="balance-option",
                 options=[{
@@ -47,11 +53,18 @@ def get_layout(**kwargs):
                 } for i in load_balancing_options + ["Combined"]] ,
                 value="Combined"
             ),
-            dcc.Graph(id="latency_vs_price"),
-            pivot_table(),
-
-            # dcc.Graph(id="total_cost"),
-
+            dcc.Loading(
+                id = "loading-icon",
+                type="circle",
+                children=[html.Div(dcc.Graph(id="latency_vs_price"))]
+            ),
+            pivot_table()
+            # dcc.Loading(
+            #     id = "loading-icon",
+            #     type="graph",
+            #     children=[html.Div( dcc.Graph(id="pivot_table"))]
+            #     #
+            # ),
         ]
     )
 
