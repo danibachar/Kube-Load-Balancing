@@ -117,7 +117,6 @@ def pivot_table():
         values=["latency","gb_price", "load", "cost_in_usd", "size_in_gb"], #vals,#"latency","gb_price", "duration"
         # columns=special_cols,/
         aggfunc={
-                # "total_cost": sum,
                 "cost_in_usd": sum,
                 "size_in_gb": sum,
                 "load": sum,
