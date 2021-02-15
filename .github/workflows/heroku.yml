@@ -1,4 +1,4 @@
-- name: Heroku Docker Container Deploy
+- name: "Heroku Docker Container Deploy"
   # You may pin to the exact commit or the version.
   # uses: lucassarcanjo/heroku-deploy@1db4c62f6032efe526c12734f18d36669218e5af
   uses: lucassarcanjo/heroku-deploy@2.1.17
@@ -12,6 +12,6 @@
     # Your Heroku App Name
     app_name: kube-opt-dash
     # Dokerfile path
-    dockerfile_path: ./Dockerfile
+    dockerfile_path: "./Dockerfile"
     # Optional build parameters
     options: # optional

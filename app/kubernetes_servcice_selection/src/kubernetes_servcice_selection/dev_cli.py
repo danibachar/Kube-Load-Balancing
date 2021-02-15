@@ -33,4 +33,4 @@ from .app import app
 def main(port, host, debug):
     overrided_port = os.environ.get('PORT', port)
     print("###overrided_port###\n{}".format(overrided_port))
-    app.run_server(port=overrided_port, debug=overrided_port, host=host)
+    app.run_server(port=overrided_port, debug=debug, host=host)

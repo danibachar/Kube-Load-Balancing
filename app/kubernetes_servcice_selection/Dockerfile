@@ -13,5 +13,5 @@ ENV DATAFRAME_NAME='/main.csv'
 RUN pwd
 RUN ls
 
-EXPOSE 8050
+EXPOSE $PORT
 CMD ["run-kubernetes_servcice_selection-dev"]

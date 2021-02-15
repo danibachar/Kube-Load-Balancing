@@ -32,24 +32,33 @@ def get_df(app_name=None, balance_name=None):
     global app_options
     global load_balancing_options
 
-    df = df_cache
+    df = None
+    if df_cache is not None:
+        df = df_cache.copy()
+
     if df is None:
-        # cache_df = pd.read_csv("~/Documents/IDC/Kube-Load-Balancing/simulations/run_csv/main.csv")
-        cache_df = pd.read_csv("/main.csv")
-        df = cache_df
+        # df_cache = pd.read_csv("~/Documents/IDC/Kube-Load-Balancing/simulations/run_csv/main.csv")
+        df_cache = pd.read_csv("/main.csv")
+        df = df_cache.copy()
         load_balancing_options = list(df_cache["load_balance"].unique())
         app_options = df_cache["app"].unique()
+
+    if not did_add_custom_cols:
+        df_cache["gb_price"] = df_cache["cost_in_usd"] / df_cache["size_in_gb"]
+        df_cache["total_cost"] = df_cache["cost_in_usd"] * df_cache["size_in_gb"]
+        did_add_custom_cols = True
+
+    if cached_latest_app_secetion is None:
         cached_latest_app_secetion = app_options[0]
 
     if not did_add_custom_cols:
-        df["gb_price"] = df["cost_in_usd"] / df["size_in_gb"]
-        df["total_cost"] = df["cost_in_usd"] * df["size_in_gb"]
+
         did_add_custom_cols = True
 
     if app_name in app_options:
         df = df[df["app"] == app_name]
-        cached_latest_app_secetion = df
-    elif cached_latest_app_secetion in app_options:
+        cached_latest_app_secetion = app_name
+    elif cached_latest_app_secetion is not None and cached_latest_app_secetion in app_options:
         df = df[df["app"] == cached_latest_app_secetion]
 
     if balance_name in load_balancing_options:

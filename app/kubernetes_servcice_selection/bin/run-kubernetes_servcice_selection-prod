@@ -29,7 +29,7 @@ EOF
 APP_MODULE=kubernetes_servcice_selection
 SCRIPTPATH=$(cd $(dirname $0); pwd -P)
 echo $SCRIPTPATH
-PORT=8000
+# PORT=8000
 PROCESSES=2
 SETTINGS_PATH=$(python -c "from ${APP_MODULE} import prod_settings; print(prod_settings.__file__)")
 

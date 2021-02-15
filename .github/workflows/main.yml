@@ -4,22 +4,22 @@
   uses: CDNievas/heroku-action@v1.0
   with:
     # Used for authentication. You can find it in your heroku homepage account settings
-    heroku_api_key: '771ebfb9-54b2-4216-98ca-57df1856260a'
+    heroku_api_key: 771ebfb9-54b2-4216-98ca-57df1856260a
     # Email from Heroku Account
-    heroku_email: 'danibachar89@gmail.com'
+    heroku_email: danibachar89@gmail.com
     # The appname to use for deploying/updating
-    heroku_app_name: 'kube-opt-dash'
+    heroku_app_name: kube-opt-dash
     # The branch that you would like to deploy to Heroku
-    branch: 'main'# optional, default is HEAD
+    branch: main # optional, default is HEAD
     # Set this to true if want to use --force
-    useforce: 'true'# optional
+    useforce: true # optional
     # Set if your app is located in a subdirectory.
-    appdir: # optional, default is 
+    appdir: # optional, default is
     # Contents of the Procfile to save and deploy
-    procfile: # optional, default is 
+    procfile: # optional, default is
     # Set to true if you need upload files generated dynamically by the GitHub Action to Heroku
     dynamicFiles: # optional
     # Buildpacks to install on Heroku
-    buildpacks: # optional, default is 
+    buildpacks: # optional, default is
     # Path to an localized env file
-    env_file: # optional, default is 
+    env_file: # optional, default is
