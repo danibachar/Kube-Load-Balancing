@@ -50,3 +50,9 @@ Bin covering - like bin packing but with finite bin count
 - datacenters.yml:
   - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
   - https://cloud.google.com/compute/docs/regions-zones
+
+
+## Release
+
+docker tag dash:latest danibachar/kube-dash:latest
+docker push danibachar/kube-dash:latest
