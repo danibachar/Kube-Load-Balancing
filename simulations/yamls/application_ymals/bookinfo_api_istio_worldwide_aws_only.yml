@@ -1,0 +1,85 @@
+# Based on - https://www.freecodecamp.org/news/why-you-should-run-your-game-servers-independently-from-your-chat-3263b4b9548e/
+services:
+  product_page:
+    name: product_page
+    label: front-end
+    dependencies:
+      review:
+        name: review
+        req_size: 50
+      details:
+        name: details
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+  review:
+    name: review
+    label: internal
+    dependencies:
+      rating:
+        name: rating
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+  details:
+    name: details
+    label: internal
+    dependencies: {}
+    expected-outbound-req-size-kb: 50
+  rating:
+    name: rating
+    label: internal
+    dependencies: {}
+    expected-outbound-req-size-kb: 50
+
+app-topology:
+  aws-us-east-1:
+    services:
+      product_page:
+          name: product_page
+          rps_capacity: 30_000
+      review:
+          name: review
+          rps_capacity: 75_000
+      details:
+          name: details
+          rps_capacity: 75_000
+  aws-us-west-1:
+    services:
+      product_page:
+          name: product_page
+          rps_capacity: 30_000
+      rating:
+          name: rating
+          rps_capacity: 75_000
+  aws-eu-west-1:
+    services:
+      product_page:
+          name: product_page
+          rps_capacity: 30_000
+      review:
+          name: review
+          rps_capacity: 75_000
+      rating:
+          name: rating
+          rps_capacity: 75_000
+      details:
+          name: details
+          rps_capacity: 75_000
+  aws-sa-east-1:
+    services:
+      product_page:
+          name: product_page
+          rps_capacity: 30_000
+      review:
+          name: review
+          rps_capacity: 75_000
+  aws-ap-southeast-1:
+    services:
+      product_page:
+          name: product_page
+          rps_capacity: 30_000
+      details:
+          name: details
+          rps_capacity: 75_000
+      rating:
+          name: rating
+          rps_capacity: 75_000

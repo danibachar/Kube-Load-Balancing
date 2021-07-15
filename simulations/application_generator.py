@@ -46,7 +46,6 @@ def _gen_cluster(zone_name, zone_cluster_details, latency, pricing, datacenters_
     for service in available_services.values():
         service_name = service["name"]
         service_capacity = service["rps_capacity"]
-        # print("services_config",services_config)
         svc = _gen_service(services_config[service_name], service_capacity)
         cluster.add_service(svc)
 
@@ -68,7 +67,6 @@ def _gen_zone(zone_name, latency, pricing, datacenters_map):
     cp = CloudProvider(cp_name)
     region_name = "-".join(zone_parts[1:len(zone_parts)])
     region_location = datacenters_map[cp_name + "-" + region_name]["location"]
-    print("location of {} = {}".format(region_name, region_location))
     region = Region(region_name, region_location)
     zone = Zone("1", region, cp, latency, pricing[cp_name])
 

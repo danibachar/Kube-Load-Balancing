@@ -1,0 +1,164 @@
+services:
+  api_server:
+    name: api_server
+    label: front-end
+    dependencies:
+      db:
+        name: db
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+  cdn:
+    name: cdn
+    label: front-end
+    dependencies:
+      storage:
+        name: storage
+        req_size: 50_000
+    expected-outbound-req-size-kb: 50_000
+  storage:
+    name: storage
+    label: internal
+    dependencies: {}
+    expected-outbound-req-size-kb: 50_000
+  db:
+    name: db
+    label: internal
+    dependencies: {}
+    expected-outbound-req-size-kb: 50
+
+app-topology:
+  aws-ap-northeast-1:
+    services:
+      api_server:
+          name: api_server
+          rps_capacity: 30_000
+      cdn:
+          name: cdn
+          rps_capacity: 30_000
+      storage:
+          name: storage
+          rps_capacity: 175_000
+  aws-ap-northeast-2:
+    services:
+      api_server:
+          name: api_server
+          rps_capacity: 30_000
+      cdn:
+          name: cdn
+          rps_capacity: 30_000
+  aws-ap-south-1:
+    services:
+      api_server:
+          name: api_server
+          rps_capacity: 30_000
+      cdn:
+          name: cdn
+          rps_capacity: 30_000
+  aws-ap-southeast-1:
+    services:
+      api_server:
+          name: api_server
+          rps_capacity: 30_000
+      cdn:
+          name: cdn
+          rps_capacity: 30_000
+  aws-ap-southeast-2:
+    services:
+      api_server:
+          name: api_server
+          rps_capacity: 30_000
+      cdn:
+          name: cdn
+          rps_capacity: 30_000
+  aws-eu-central-1:
+    services:
+      api_server:
+          name: api_server
+          rps_capacity: 30_000
+      cdn:
+          name: cdn
+          rps_capacity: 30_000
+      storage:
+          name: storage
+          rps_capacity: 140_000
+      db:
+          name: db
+          rps_capacity: 300_000
+  aws-eu-west-1:
+    services:
+      api_server:
+          name: api_server
+          rps_capacity: 30_000
+      cdn:
+          name: cdn
+          rps_capacity: 30_000
+  aws-eu-west-2:
+    services:
+      api_server:
+          name: api_server
+          rps_capacity: 30_000
+      cdn:
+          name: cdn
+          rps_capacity: 30_000
+  aws-eu-west-3:
+    services:
+      api_server:
+          name: api_server
+          rps_capacity: 30_000
+      cdn:
+          name: cdn
+          rps_capacity: 30_000
+  aws-northamerica-central-1:
+    services:
+      api_server:
+          name: api_server
+          rps_capacity: 30_000
+      cdn:
+          name: cdn
+          rps_capacity: 30_000
+  aws-us-east-1:
+    services:
+      api_server:
+          name: api_server
+          rps_capacity: 30_000
+      cdn:
+          name: cdn
+          rps_capacity: 30_000
+      storage:
+          name: storage
+          rps_capacity: 175_000
+  aws-us-east-2:
+    services:
+      api_server:
+          name: api_server
+          rps_capacity: 30_000
+      cdn:
+          name: cdn
+          rps_capacity: 30_000
+  aws-us-west-1:
+    services:
+      api_server:
+          name: api_server
+          rps_capacity: 30_000
+      cdn:
+          name: cdn
+          rps_capacity: 30_000
+  aws-us-west-2:
+    services:
+      api_server:
+          name: api_server
+          rps_capacity: 30_000
+      cdn:
+          name: cdn
+          rps_capacity: 30_000
+  aws-sa-east-1:
+    services:
+      api_server:
+          name: api_server
+          rps_capacity: 30_000
+      cdn:
+          name: cdn
+          rps_capacity: 30_000
+      storage:
+          name: storage
+          rps_capacity: 75_000

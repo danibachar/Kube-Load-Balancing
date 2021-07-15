@@ -4,6 +4,13 @@ zones:
     all: 0.01
 regions:
   from:
+    US: 0.01
+    AF: 0.01
+    EU: 0.01
+    AP: 0.01
+    SA: 0.01
+cross-regions:
+  from:
     US: 0.02
     AF: 0.147
     EU: 0.02

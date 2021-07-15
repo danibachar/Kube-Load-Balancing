@@ -17,7 +17,7 @@ VERSION = None  # get this from __version__.py
 
 
 # What packages are required for this module to be executed?
-REQUIRED = ["pandas","dash>=0.40.0", "dash-bootstrap-components>=0.3.0", "click", "xlrd>=1.0.0", "dash-pivottable"]
+REQUIRED = ["pandas","dash>=0.40.0", "dash-bootstrap-components>=0.3.0", "click", "xlrd>=1.0.0", "dash-pivottable", "networkx", "pygraphviz", "dash_interactive_graphviz"]
 
 # What packages are optional?
 EXTRAS = {"prod": ["mod_wsgi"]}

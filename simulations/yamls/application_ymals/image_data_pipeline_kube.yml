@@ -117,34 +117,34 @@ app-topology:
           rps_capacity: 30_000
       pub_sub_stream:
           name: pub_sub_stream
-          rps_capacity: 65_000
+          rps_capacity: 90_000
       data_extractor:
           name: data_extractor
-          rps_capacity: 65_000
+          rps_capacity: 90_000
       data_cleaner:
           name: data_cleaner
-          rps_capacity: 65_000
+          rps_capacity: 90_000
       data_normalizer:
           name: data_normalizer
-          rps_capacity: 65_000
+          rps_capacity: 90_000
       model_trainer:
           name: model_trainer
-          rps_capacity: 65_000
+          rps_capacity: 90_000
       model_evaluator:
           name: model_evaluator
-          rps_capacity: 65_000
+          rps_capacity: 90_000
       storage_images:
           name: storage_images
-          rps_capacity: 65_000
+          rps_capacity: 90_000
       storage_model:
           name: storage_model
-          rps_capacity: 65_000
+          rps_capacity: 90_000
       storage_artifacts:
           name: storage_artifacts
-          rps_capacity: 280_000
+          rps_capacity: 350_000
       db_elastic:
           name: db_elastic
-          rps_capacity: 65_000
+          rps_capacity: 90_000
       db_sql:
           name: db_sql
-          rps_capacity: 65_000
+          rps_capacity: 90_000

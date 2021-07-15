@@ -11,7 +11,11 @@ regions:
     SA: 0.08
 cross-regions:
   from:
-    MOST: 0.08
+    US: 0.08
+    AF: 0.08
+    EU: 0.08
+    AP: 0.08
+    SA: 0.08
     OCEANIA: 0.15
 worldwide:
   from:

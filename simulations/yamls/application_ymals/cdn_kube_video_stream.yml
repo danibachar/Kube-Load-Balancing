@@ -37,7 +37,7 @@ app-topology:
           rps_capacity: 30_000
       storage:
           name: storage
-          rps_capacity: 175_000
+          rps_capacity: 300_000
   aws-ap-northeast-2:
     services:
       api_server:
@@ -86,7 +86,7 @@ app-topology:
       cdn:
           name: cdn
           rps_capacity: 30_000
-  gcp-asia-southeast-1:
+  gcp-asia-southeast-1: # Singapore
     services:
       api_server:
           name: api_server
@@ -96,10 +96,10 @@ app-topology:
           rps_capacity: 30_000
       storage:
           name: storage
-          rps_capacity: 100_000
+          rps_capacity: 200_000
       db:
           name: db
-          rps_capacity: 300_000
+          rps_capacity: 450_000
   gcp-asia-east-1:
     services:
       api_server:
@@ -118,10 +118,10 @@ app-topology:
           rps_capacity: 30_000
       storage:
           name: storage
-          rps_capacity: 140_000
+          rps_capacity: 200_000
       db:
           name: db
-          rps_capacity: 300_000
+          rps_capacity: 450_000
   aws-eu-west-1:
     services:
       api_server:
@@ -180,7 +180,7 @@ app-topology:
           rps_capacity: 30_000
       storage:
           name: storage
-          rps_capacity: 140_000
+          rps_capacity: 250_000
   aws-northamerica-central-1:
     services:
       api_server:
@@ -199,7 +199,7 @@ app-topology:
           rps_capacity: 30_000
       storage:
           name: storage
-          rps_capacity: 175_000
+          rps_capacity: 300_000
   aws-us-east-2:
     services:
       api_server:
@@ -266,10 +266,10 @@ app-topology:
           rps_capacity: 30_000
       storage:
           name: storage
-          rps_capacity: 175_000
+          rps_capacity: 300_000
       db:
           name: db
-          rps_capacity: 300_000
+          rps_capacity: 450_000
   aws-sa-east-1:
     services:
       api_server:
@@ -280,7 +280,10 @@ app-topology:
           rps_capacity: 30_000
       storage:
           name: storage
-          rps_capacity: 75_000
+          rps_capacity: 150_000
+      db:
+          name: db
+          rps_capacity: 200_000
   gcp-sa-east-1:
     services:
       api_server:

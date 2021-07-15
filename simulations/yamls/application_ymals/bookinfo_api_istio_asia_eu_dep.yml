@@ -37,10 +37,10 @@ app-topology:
           rps_capacity: 30_000
       review:
           name: review
-          rps_capacity: 50_000
+          rps_capacity: 75_000
       details:
           name: details
-          rps_capacity: 50_000
+          rps_capacity: 75_000
   aws-ap-southeast-1:
     services:
       product_page:
@@ -48,7 +48,7 @@ app-topology:
           rps_capacity: 30_000
       rating:
           name: rating
-          rps_capacity: 50_000
+          rps_capacity: 75_000
   gcp-eu-west-1:
     services:
       product_page:
@@ -56,21 +56,21 @@ app-topology:
           rps_capacity: 30_000
       review:
           name: review
-          rps_capacity: 50_000
+          rps_capacity: 75_000
       rating:
           name: rating
-          rps_capacity: 50_000
+          rps_capacity: 75_000
       details:
           name: details
-          rps_capacity: 50_000
-  gcp-eu-west-1:
+          rps_capacity: 75_000
+  gcp-eu-west-2:
     services:
       product_page:
           name: product_page
           rps_capacity: 30_000
       review:
           name: review
-          rps_capacity: 50_000
+          rps_capacity: 75_000
   gcp-asia-east-1:
     services:
       product_page:
@@ -78,7 +78,7 @@ app-topology:
           rps_capacity: 30_000
       details:
           name: details
-          rps_capacity: 50_000
+          rps_capacity: 75_000
       rating:
           name: rating
-          rps_capacity: 50_000
+          rps_capacity: 75_000

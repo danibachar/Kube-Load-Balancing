@@ -27,6 +27,10 @@ class Cluster:
     def id(self):
         return self.zone.name
 
+    @property
+    def supported_job_types(self):
+        return set(self.services.keys())
+
     def service(self, job_type):
         return self.services.get(job_type, None)
 
@@ -39,24 +43,30 @@ class Cluster:
 
     def join_cluster(self, cluster):
         logging.debug("join_cluster - {}".format(cluster))
+        if self.id == cluster.id:
+            return
+        if self.mesh.get(cluster.id, None) is not None:
+            return
         self.mesh[cluster.id] = cluster
+        cluster.join_cluster(self)
 
     def remove_cluster(self, clsuter):
         logging.debug("remove_cluster - {}".format(cluster))
         self.mesh[cluster.id] = None
-
-    def supported_job_types(self):
-        return set(self.services.keys())
 
     def available_capacity(self, job_type, at_tik):
         service = self.service(job_type)
         if service is None:
             return -1 # incating no support at all
         return service.residual_capacity(at_tik)
-        
+
     def reset_state(self):
         for service in self.services.values():
             service.reset_state()
+
+    def build_services_df(self):
+        for service in self.services.values():
+            service.build_df()
 
     def consume(self, job ,at_tik):
         job.arrival_time = at_tik

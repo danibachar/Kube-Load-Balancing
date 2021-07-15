@@ -21,7 +21,7 @@ app-topology:
           rps_capacity: 30_000
       storage:
           name: storage
-          rps_capacity: 275_000
+          rps_capacity: 350_000
   aws-ap-northeast-2:
     services:
       image_server:
@@ -84,7 +84,7 @@ app-topology:
           rps_capacity: 30_000
       storage:
           name: storage
-          rps_capacity: 280_000
+          rps_capacity: 350_000
   gcp-eu-west-1:
     services:
       image_server:
@@ -117,7 +117,7 @@ app-topology:
           rps_capacity: 30_000
       storage:
           name: storage
-          rps_capacity: 400_000
+          rps_capacity: 450_000
   aws-us-east-2:
     services:
       image_server:

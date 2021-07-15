@@ -16,48 +16,87 @@ from .exceptions import InvalidLayoutError
 
 import pandas as pd
 import numpy as np
+from math import cos, sin, atan2, sqrt
+from os import listdir
+from os.path import isfile, join
+import random
 
-df_cache = pd.read_csv("/main.csv")
-# df_cache = pd.read_csv("~/Documents/IDC/Kube-Load-Balancing/simulations/run_csv/main.csv")
-did_add_custom_cols = False
+cache = {}
+BASE_DIR_ENV_VAR = "/Users/danielbachar/Documents/IDC/Kube-Load-Balancing/app/kubernetes_servcice_selection/dataframes"
+# BASE_DIR_ENV_VAR = "/dataframes"
 
-load_balancing_options = list(df_cache["load_balance"].unique())
-app_options = df_cache["app"].unique()
+def get_app_options():
+    global cache
+    global BASE_DIR_ENV_VAR
 
-def get_df(app_name=None, balance_name=None):
-    global did_add_custom_cols
-    global df_cache
-    global app_options
-    global load_balancing_options
+    name = "{}/main/".format(BASE_DIR_ENV_VAR)
 
-    df = None
-    if df_cache is not None:
-        if not did_add_custom_cols:
-            df_cache["gb_price"] = df_cache["cost_in_usd"] / df_cache["size_in_gb"]
-            did_add_custom_cols = True
-        df = df_cache.copy()
+    if cache.get(name, None) is None:
+        onlyfiles = [f for f in listdir(name) if isfile(join(name, f))]
+        cache[name] = sorted(list(map(lambda x: x.replace(".csv", ""), onlyfiles)))
+    return cache[name]
 
+def get_balancing_options():
+    return ["Combined", "KOSS", "WRR", "RR"]
 
-    if df is None:
-        # df_cache = pd.read_csv("~/Documents/IDC/Kube-Load-Balancing/simulations/run_csv/main.csv")
-        df_cache = pd.read_csv("/main.csv")
+def get_price_heat_map_df(app_name):
+    global BASE_DIR_ENV_VAR
+    return pd.read_csv("{}/heatmaps/price_{}.csv".format(BASE_DIR_ENV_VAR, app_name), index_col=False)
 
-        df_cache["gb_price"] = df_cache["cost_in_usd"] / df_cache["size_in_gb"]
+def get_latency_heat_map_df(app_name):
+    global BASE_DIR_ENV_VAR
+    return pd.read_csv("{}/heatmaps/latency_{}.csv".format(BASE_DIR_ENV_VAR, app_name), index_col=False)
 
-        df = df_cache.copy()
-        load_balancing_options = list(df_cache["load_balance"].unique())
-        app_options = df_cache["app"].unique()
+def get_dag_df(app_name):
+    global BASE_DIR_ENV_VAR
+    return pd.read_csv("{}/app_dag/{}.csv".format(BASE_DIR_ENV_VAR, app_name))
 
-    if not did_add_custom_cols:
-        did_add_custom_cols = True
+def get_df(app_name, balance_name=None):
+    global cache
+    global BASE_DIR_ENV_VAR
 
-    if app_name in app_options:
-        df = df[df["app"] == app_name]
+    name = "{}/main/{}.csv".format(BASE_DIR_ENV_VAR, app_name)
 
+    if cache.get(name, None) is None:
+        df = pd.read_csv(name)
+        if set(["cost_in_usd", "size_in_gb"]).issubset(set(df.columns)):
+            df["gb_price"] = df["cost_in_usd"] / df["size_in_gb"]
+        df = df.replace("OURS", "KOSS")
+        cache[name] = df
+
+    df = cache[name]
+
+    load_balancing_options = list(df["load_balance"].unique())
     if balance_name in load_balancing_options:
         df = df[df["load_balance"] == balance_name]
-
     return df
+
+def center_geolocation(geolocations):
+    """
+    Provide a relatively accurate center lat, lon returned as a list pair, given
+    a list of list pairs.
+    ex: in: geolocations = ((lat1,lon1), (lat2,lon2),)
+        out: (center_lat, center_lon)
+    """
+    x = 0
+    y = 0
+    z = 0
+
+    for lat, lon in geolocations:
+        lat = float(lat)
+        lon = float(lon)
+        x += cos(lat) * cos(lon)
+        y += cos(lat) * sin(lon)
+        z += sin(lat)
+
+    x = float(x / len(geolocations))
+    y = float(y / len(geolocations))
+    z = float(z / len(geolocations))
+
+    return (atan2(z, sqrt(x * x + y * y)), atan2(y, x))
+
+def random_color():
+    return "#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
 
 def component(func):
     """Decorator to help vanilla functions as pseudo Dash Components"""

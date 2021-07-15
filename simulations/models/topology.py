@@ -41,8 +41,7 @@ class Zone:
     def price_per_gb(self, other_zone):
         if other_zone is None:
             return 0.15
-        # return  self.pricing[self.name][other_zone.name]
-
+            
         logging.debug("checking price from:{} <-> to:{}".format(self.name, other_zone.name))
 
         is_same_zone = self == other_zone
@@ -142,12 +141,32 @@ def _region_key(source_region):
     raise
 
 def _cross_regions_key(source_region):
+    # if any(ext in source_region.id for ext in ["ap-southeast-2", "australia", "sydney"]):
+    #     return "OCEANIA"
+    # return "MOST"
+    if any(ext in source_region.id for ext in ["us", "america", "canada"]):
+        return "US"
+    if "eu" in source_region.id:
+        return "EU"
+    if any(ext in source_region.id for ext in ["ap-northeast", "asia-northeast"]):
+        return "AP"
+    if any(ext in source_region.id for ext in ["ap", "asia"]):
+        return "AP"
     if any(ext in source_region.id for ext in ["ap-southeast-2", "australia", "sydney"]):
         return "OCEANIA"
-    return "MOST"
+    if any(ext in source_region.id for ext in ["ap", "asia"]):
+        return "AP"
+    if any(ext in source_region.id for ext in ["sa",]):
+        return "SA"
+    if any(ext in source_region.id for ext in ["af"]):
+        return "AF"
+    raise
 
 def _world_wide_from_to_keys(source_region, target_region):
-
+    def _cross_regions_key(source_region):
+        if any(ext in source_region.id for ext in ["ap-southeast-2", "australia", "sydney"]):
+            return "OCEANIA"
+        return "MOST"
     if any(ext in source_region.id for ext in ["us", "america", "canada"]):
         return "US", _cross_regions_key(target_region)
     if "eu" in source_region.id:

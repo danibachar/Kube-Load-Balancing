@@ -21,7 +21,7 @@ app-topology:
           rps_capacity: 30_000
       storage:
           name: storage
-          rps_capacity: 175_000
+          rps_capacity: 200_000
   aws-ap-northeast-2:
     services:
       image_server:
@@ -59,7 +59,7 @@ app-topology:
           rps_capacity: 30_000
       storage:
           name: storage
-          rps_capacity: 100_000
+          rps_capacity: 150_000
   gcp-asia-east-1:
     services:
       image_server:
@@ -87,7 +87,7 @@ app-topology:
           rps_capacity: 30_000
       storage:
           name: storage
-          rps_capacity: 140_000
+          rps_capacity: 175_000
   gcp-eu-west-1:
     services:
       image_server:
@@ -110,7 +110,7 @@ app-topology:
           rps_capacity: 30_000
       storage:
           name: storage
-          rps_capacity: 140_000
+          rps_capacity: 175_000
   aws-northamerica-central-1:
     services:
       image_server:
@@ -123,7 +123,7 @@ app-topology:
           rps_capacity: 30_000
       storage:
           name: storage
-          rps_capacity: 175_000
+          rps_capacity: 200_000
   aws-us-east-2:
     services:
       image_server:
@@ -166,7 +166,7 @@ app-topology:
           rps_capacity: 30_000
       storage:
           name: storage
-          rps_capacity: 175_000
+          rps_capacity: 200_000
   aws-sa-east-1:
     services:
       image_server:
@@ -174,7 +174,7 @@ app-topology:
           rps_capacity: 30_000
       storage:
           name: storage
-          rps_capacity: 75_000
+          rps_capacity: 90_000
   gcp-sa-east-1:
     services:
       image_server:

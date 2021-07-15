@@ -1,0 +1,15 @@
+,source,target
+0,data_puller,pub_sub_stream
+1,pub_sub_stream,data_extractor
+2,data_extractor,data_cleaner
+3,data_cleaner,data_normalizer
+4,data_cleaner,storage_artifacts
+5,data_normalizer,model_trainer
+6,data_normalizer,storage_artifacts
+7,model_trainer,model_evaluator
+8,model_trainer,storage_artifacts
+9,model_trainer,storage_images
+10,model_evaluator,storage_model
+11,model_evaluator,storage_artifacts
+12,model_evaluator,db_elastic
+13,model_evaluator,db_sql

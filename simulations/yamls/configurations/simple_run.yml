@@ -2,33 +2,124 @@ base_config:
   funcs:
     RR:
       weight_calc: round_robin
-    WRR:
-      weight_calc: smooth_weighted_round_robin
-    OURS:
+    # WRR:
+    #   weight_calc: smooth_weighted_round_robin
+    KOSS:
       weight_calc: model
-  tiks_count: 200
-  rps:  26_000
+  tiks_count: 500 # Must have more than 200 tiks!!!
+  rps:
+    - 26_000
   distribution: pareto
-  rounds: 1
+  rounds: 20
   cost_function:
     price_weight:
+      - 0.01
+      - 0.1
+      - 0.2
+      - 0.3
+      - 0.4
       - 0.5
-      - 1.0
-      - 0.0
+      - 0.6
+      - 0.7
+      - 0.8
+      - 0.9
+      - 0.99
     latency_weight:
+      - 0.99
+      - 0.9
+      - 0.8
+      - 0.7
+      - 0.6
       - 0.5
-      - 0.0
-      - 1.0
+      - 0.4
+      - 0.3
+      - 0.2
+      - 0.1
+      - 0.01
 simulation_ymals:
   apps:
-      - yamls/application_ymals/bookinfo_api_istio_worldwide.yml
-      - yamls/application_ymals/bookinfo_api_istio_asia_eu_dep.yml
-      - yamls/application_ymals/bookinfo_api_istio_america.yml
-      - yamls/application_ymals/cdn_kube_multi_storge.yml
-      - yamls/application_ymals/cdn_kube_few_storage.yml
-      - yamls/application_ymals/cdn_kube_video_stream.yml
-      - yamls/application_ymals/game_and_chat_app_worldwide.yml
-      - yamls/application_ymals/image_data_pipeline_kube.yml
+      #######################################################################
+      # DONE - No matter how many ticks or rounds will be converge to 2 points
+      # - yamls/application_ymals/bookinfo_api_istio_worldwide.yml
+      #######################################################################
+
+      #######################################################################
+      # DONE - Become normal only after 200 tiks with at least 1 round
+      - yamls/application_ymals/shared_api_3_service_chain_world_wide.yml
+      #######################################################################
+
+      #######################################################################
+      # DONE - No matter how many ticks or rounds will be converge to a single point
+      # - yamls/application_ymals/bookinfo_api_istio_worldwide_aws_only.yml
+      #######################################################################
+
+      #######################################################################
+      # DONE - Become normal only after 200 tiks with at least 1 round
+      # - yamls/application_ymals/bookinfo_api_istio_asia_eu_dep.yml
+      #######################################################################
+
+      #######################################################################
+      # DONE - Become normal only after 200 tiks with at least 1 round
+      # - yamls/application_ymals/bookinfo_api_istio_asia_eu_dep_gcp_only.yml
+      #######################################################################
+
+      #######################################################################
+      # DONE - Become normal only after 200 tiks with at least 1 round
+      # - yamls/application_ymals/bookinfo_api_istio_asia_eu_dep_aws_only.yml
+      #######################################################################
+
+      #######################################################################
+      # DONE - No matter how many ticks or rounds will be converge to 2 points
+      # Possible palying with config
+      # - yamls/application_ymals/bookinfo_api_istio_america.yml
+      #######################################################################
+
+      #######################################################################
+      # DONE - No matter how many ticks or rounds will be converge to 2 points
+      # - yamls/application_ymals/bookinfo_api_istio_america_aws_only.yml
+      #######################################################################
+
+      #######################################################################
+      # DONE - Become normal only after 400 tiks with at least 1 round
+      # - yamls/application_ymals/cdn_kube_multi_storge.yml
+      #######################################################################
+
+      #######################################################################
+      # DONE - No matter how many ticks or rounds will be converge to a single point
+      # - yamls/application_ymals/cdn_kube_multi_storge_aws_only.yml
+      #######################################################################
+
+      #######################################################################
+      # DONE - No matter how many ticks or rounds will be converge to a single point
+      # - yamls/application_ymals/cdn_kube_few_storage.yml
+      #######################################################################
+
+      #######################################################################
+      # DONE - No matter how many ticks or rounds will be converge to a single point
+      # - yamls/application_ymals/cdn_kube_few_storage_aws_only.yml
+      #######################################################################
+
+      #######################################################################
+      # DONE - Become normal only after 400 tiks with at least 1 round
+      # - yamls/application_ymals/cdn_kube_video_stream.yml
+      ######################################################################
+
+      #########
+      # - yamls/application_ymals/cdn_kube_video_stream_aws_only.yml # Crash
+      #########
+
+      #######################################################################
+      # DONE - Become normal only after 400 tiks with at least 1 round
+      # - yamls/application_ymals/game_and_chat_app_worldwide.yml
+      #######################################################################
+
+      #########
+      # - yamls/application_ymals/game_and_chat_app_worldwide_aws_only.yml # Check not solving
+      #########
+
+      #########
+      # - yamls/application_ymals/image_data_pipeline_kube.yml # Crash due to max price/lat = 0
+      #########
   latency: yamls/latency/full_matrix.yml
   pricing:
     - yamls/pricing/aws.yml

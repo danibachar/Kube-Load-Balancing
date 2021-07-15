@@ -2,6 +2,9 @@ FROM python:3.6
 
 ENV DASH_DEBUG_MODE True
 COPY ./ ./main.csv
+COPY ./dataframes ./dataframes
+
+RUN apt-get update -y && apt-get install python3-dev graphviz libgraphviz-dev pkg-config -y
 
 COPY ./ ./
 RUN set -ex && \

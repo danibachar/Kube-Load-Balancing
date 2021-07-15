@@ -94,6 +94,7 @@ ${ECHO} mod_wsgi-express start-server \
         --processes ${PROCESSES} \
         --compress-responses \
         --isatty \
+        --user www-data \
+        --group www-data \
 
 # TODO get the value of the assets folder name from the Dash config
-       

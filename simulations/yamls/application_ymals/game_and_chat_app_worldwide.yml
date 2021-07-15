@@ -32,7 +32,7 @@ app-topology:
           rps_capacity: 30_000
       db:
           name: db
-          rps_capacity: 200_000
+          rps_capacity: 300_000
   gcp-us-west-1:
     services:
       game:
@@ -83,4 +83,4 @@ app-topology:
           rps_capacity: 30_000
       db:
           name: db
-          rps_capacity: 200_000
+          rps_capacity: 300_000

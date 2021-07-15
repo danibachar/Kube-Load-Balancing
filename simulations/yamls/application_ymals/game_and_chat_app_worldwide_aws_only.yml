@@ -1,0 +1,86 @@
+services:
+  game:
+    name: game
+    label: front-end
+    expected-outbound-req-size-kb: 50
+    dependencies:
+      db:
+        name: db
+        req_size: 50
+  chat:
+    name: chat
+    label: front-end
+    expected-outbound-req-size-kb: 50
+    dependencies:
+      db:
+        name: db
+        req_size: 50
+  db:
+    name: db
+    label: internal
+    expected-outbound-req-size-kb: 50
+    dependencies: {}
+
+app-topology:
+  aws-us-east-1:
+    services:
+      game:
+          name: game
+          rps_capacity: 30_000
+      chat:
+          name: chat
+          rps_capacity: 30_000
+      db:
+          name: db
+          rps_capacity: 300_000
+  aws-us-west-1:
+    services:
+      game:
+          name: game
+          rps_capacity: 30_000
+      chat:
+          name: chat
+          rps_capacity: 30_000
+  aws-eu-west-1:
+    services:
+      game:
+          name: game
+          rps_capacity: 30_000
+      chat:
+          name: chat
+          rps_capacity: 30_000
+  aws-eu-central-1:
+    services:
+      game:
+          name: game
+          rps_capacity: 30_000
+      chat:
+          name: chat
+          rps_capacity: 30_000
+  aws-sa-east-1:
+    services:
+      game:
+          name: game
+          rps_capacity: 30_000
+      chat:
+          name: chat
+          rps_capacity: 30_000
+  aws-ap-south-1:
+    services:
+      game:
+          name: game
+          rps_capacity: 30_000
+      chat:
+          name: chat
+          rps_capacity: 30_000
+  aws-ap-northeast-1:
+    services:
+      game:
+          name: game
+          rps_capacity: 30_000
+      chat:
+          name: chat
+          rps_capacity: 30_000
+      db:
+          name: db
+          rps_capacity: 300_000

@@ -9,7 +9,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-from utils.plots import plot_avg, full_plot, bar_plot
 from utils.cost import simple_max_addative_weight
 
 def _90th(x):
