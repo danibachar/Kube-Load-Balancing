@@ -4,6 +4,7 @@ import logging, threading, collections
 class State:
     round_robin_map = {}
     weighted_round_robin_map = {}
+
     lock = threading.Lock()
 
 state = State()
@@ -26,12 +27,12 @@ def round_robin(options, weights, key):
     state.lock.release()
     return selection
 
-#
+# Smooth Weighted Round Robin
 def smooth_weighted_round_robin(options, weights, key):
     if len(options) != len(weights):
-        raise
+        raise Exception("smooth_weighted_round_robin 1")
     if len(options) == 0:
-        raise
+        raise Exception("smooth_weighted_round_robin 2")
     if len(options) == 1:
         return options[0]
 

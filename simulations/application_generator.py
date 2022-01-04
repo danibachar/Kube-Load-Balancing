@@ -1,4 +1,3 @@
-import models
 from models import CloudProvider, Region, Zone, Cluster, Service, ServiceDependency
 
 def generate_application(app_map, latency_map, pricing_map, datacenters_map, app_name):

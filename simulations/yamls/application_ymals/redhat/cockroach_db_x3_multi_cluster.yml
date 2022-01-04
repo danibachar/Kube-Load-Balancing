@@ -1,0 +1,40 @@
+services:
+  keyclock:
+    name: keyclock
+    label: front-end
+    dependencies:
+      cockroach-db:
+        name: cockroach-db
+        req_size: 10
+    expected-outbound-req-size-kb: 5
+  cockroach-db:
+    name: cockroach-db
+    label: internal
+    dependencies: {}
+    expected-outbound-req-size-kb: 100
+
+app-topology:
+  aws-northamerica-central-1:
+    services:
+      cockroach-db:
+          name: cockroach-db
+          rps_capacity: 35_000
+      keyclock:
+          name: keyclock
+          rps_capacity: 30_000
+  gcp-sa-east-1:
+    services:
+      cockroach-db:
+          name: cockroach-db
+          rps_capacity: 35_000
+      keyclock:
+          name: keyclock
+          rps_capacity: 30_000
+  aws-us-west-2:
+    services:
+      cockroach-db:
+          name: cockroach-db
+          rps_capacity: 35_000
+      keyclock:
+          name: keyclock
+          rps_capacity: 30_000

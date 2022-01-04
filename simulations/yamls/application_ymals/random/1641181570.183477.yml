@@ -1,0 +1,76 @@
+app-topology:
+  aws-eu-west-3:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 62757
+      '3':
+        name: '3'
+        rps_capacity: 62656
+  gcp-eu-west-4:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 63072
+      '3':
+        name: '3'
+        rps_capacity: 63425
+  gcp-sa-east-1:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 63171
+      '3':
+        name: '3'
+        rps_capacity: 62919
+services:
+  '0':
+    dependencies:
+      '2':
+        name: '2'
+        req_size: 50
+      '3':
+        name: '3'
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+    label: front-end
+    name: '0'
+  '1':
+    dependencies:
+      '2':
+        name: '2'
+        req_size: 50
+      '3':
+        name: '3'
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+    label: front-end
+    name: '1'
+  '2':
+    dependencies: {}
+    expected-outbound-req-size-kb: 50
+    label: internal
+    name: '2'
+  '3':
+    dependencies: {}
+    expected-outbound-req-size-kb: 50
+    label: internal
+    name: '3'

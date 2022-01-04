@@ -1,0 +1,302 @@
+app-topology:
+  aws-ap-southeast-2:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 30000
+      '3':
+        name: '3'
+        rps_capacity: 30000
+      '5':
+        name: '5'
+        rps_capacity: 201608
+      '7':
+        name: '7'
+        rps_capacity: 223430
+      '8':
+        name: '8'
+        rps_capacity: 521104
+      '9':
+        name: '9'
+        rps_capacity: 125843
+  aws-eu-central-1:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 30000
+      '3':
+        name: '3'
+        rps_capacity: 30000
+      '7':
+        name: '7'
+        rps_capacity: 222626
+  aws-eu-west-2:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 30000
+      '3':
+        name: '3'
+        rps_capacity: 30000
+      '4':
+        name: '4'
+        rps_capacity: 188888
+      '5':
+        name: '5'
+        rps_capacity: 201392
+      '9':
+        name: '9'
+        rps_capacity: 126391
+  aws-eu-west-3:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 30000
+      '3':
+        name: '3'
+        rps_capacity: 30000
+      '4':
+        name: '4'
+        rps_capacity: 188908
+      '7':
+        name: '7'
+        rps_capacity: 223053
+  aws-northamerica-central-1:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 30000
+      '3':
+        name: '3'
+        rps_capacity: 30000
+      '4':
+        name: '4'
+        rps_capacity: 189542
+      '7':
+        name: '7'
+        rps_capacity: 223763
+      '9':
+        name: '9'
+        rps_capacity: 126532
+  gcp-asia-east-1:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 30000
+      '3':
+        name: '3'
+        rps_capacity: 30000
+      '4':
+        name: '4'
+        rps_capacity: 188662
+      '5':
+        name: '5'
+        rps_capacity: 201987
+      '7':
+        name: '7'
+        rps_capacity: 224357
+      '8':
+        name: '8'
+        rps_capacity: 520799
+      '9':
+        name: '9'
+        rps_capacity: 125649
+  gcp-asia-south-1:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 30000
+      '3':
+        name: '3'
+        rps_capacity: 30000
+      '5':
+        name: '5'
+        rps_capacity: 201173
+      '6':
+        name: '6'
+        rps_capacity: 1008000
+      '7':
+        name: '7'
+        rps_capacity: 222980
+      '9':
+        name: '9'
+        rps_capacity: 125474
+  gcp-eu-west-3:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 30000
+      '3':
+        name: '3'
+        rps_capacity: 30000
+      '5':
+        name: '5'
+        rps_capacity: 201840
+      '7':
+        name: '7'
+        rps_capacity: 222191
+      '8':
+        name: '8'
+        rps_capacity: 520497
+      '9':
+        name: '9'
+        rps_capacity: 126111
+services:
+  '0':
+    dependencies:
+      '4':
+        name: '4'
+        req_size: 50
+      '5':
+        name: '5'
+        req_size: 50
+      '6':
+        name: '6'
+        req_size: 50
+      '9':
+        name: '9'
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+    label: front-end
+    name: '0'
+  '1':
+    dependencies:
+      '4':
+        name: '4'
+        req_size: 50
+      '5':
+        name: '5'
+        req_size: 50
+      '6':
+        name: '6'
+        req_size: 50
+      '7':
+        name: '7'
+        req_size: 50
+      '9':
+        name: '9'
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+    label: front-end
+    name: '1'
+  '2':
+    dependencies:
+      '5':
+        name: '5'
+        req_size: 50
+      '6':
+        name: '6'
+        req_size: 50
+      '7':
+        name: '7'
+        req_size: 50
+      '8':
+        name: '8'
+        req_size: 50
+      '9':
+        name: '9'
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+    label: front-end
+    name: '2'
+  '3':
+    dependencies:
+      '4':
+        name: '4'
+        req_size: 50
+      '5':
+        name: '5'
+        req_size: 50
+      '6':
+        name: '6'
+        req_size: 50
+      '8':
+        name: '8'
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+    label: front-end
+    name: '3'
+  '4':
+    dependencies: {}
+    expected-outbound-req-size-kb: 50
+    label: internal
+    name: '4'
+  '5':
+    dependencies:
+      '7':
+        name: '7'
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+    label: internal
+    name: '5'
+  '6':
+    dependencies:
+      '8':
+        name: '8'
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+    label: internal
+    name: '6'
+  '7':
+    dependencies: {}
+    expected-outbound-req-size-kb: 50
+    label: internal
+    name: '7'
+  '8':
+    dependencies: {}
+    expected-outbound-req-size-kb: 50
+    label: internal
+    name: '8'
+  '9':
+    dependencies: {}
+    expected-outbound-req-size-kb: 50
+    label: internal
+    name: '9'

@@ -1,0 +1,512 @@
+app-topology:
+  aws-eu-west-1:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '5':
+        name: '5'
+        rps_capacity: 63250
+      '8':
+        name: '8'
+        rps_capacity: 644148
+      '9':
+        name: '9'
+        rps_capacity: 261130
+  aws-eu-west-3:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '10':
+        name: '10'
+        rps_capacity: 3117093
+      '2':
+        name: '2'
+        rps_capacity: 50548
+      '5':
+        name: '5'
+        rps_capacity: 63010
+      '7':
+        name: '7'
+        rps_capacity: 481236
+      '8':
+        name: '8'
+        rps_capacity: 643131
+      '9':
+        name: '9'
+        rps_capacity: 261193
+  aws-northamerica-central-1:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 49985
+      '4':
+        name: '4'
+        rps_capacity: 72028
+      '5':
+        name: '5'
+        rps_capacity: 63089
+      '9':
+        name: '9'
+        rps_capacity: 261263
+  aws-sa-east-1:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 50353
+      '3':
+        name: '3'
+        rps_capacity: 1008000
+      '4':
+        name: '4'
+        rps_capacity: 72069
+      '5':
+        name: '5'
+        rps_capacity: 62834
+      '7':
+        name: '7'
+        rps_capacity: 481827
+      '8':
+        name: '8'
+        rps_capacity: 643536
+      '9':
+        name: '9'
+        rps_capacity: 260411
+  aws-us-east-1:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '5':
+        name: '5'
+        rps_capacity: 62586
+      '7':
+        name: '7'
+        rps_capacity: 481639
+      '9':
+        name: '9'
+        rps_capacity: 260875
+  gcp-asia-east-1:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '10':
+        name: '10'
+        rps_capacity: 3113829
+      '5':
+        name: '5'
+        rps_capacity: 62654
+      '6':
+        name: '6'
+        rps_capacity: 655315
+      '7':
+        name: '7'
+        rps_capacity: 481965
+      '8':
+        name: '8'
+        rps_capacity: 642322
+      '9':
+        name: '9'
+        rps_capacity: 260276
+  gcp-asia-northeast-1:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 50564
+      '4':
+        name: '4'
+        rps_capacity: 71913
+      '5':
+        name: '5'
+        rps_capacity: 62973
+      '7':
+        name: '7'
+        rps_capacity: 481954
+      '8':
+        name: '8'
+        rps_capacity: 642303
+      '9':
+        name: '9'
+        rps_capacity: 260651
+  gcp-asia-south-1:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 50399
+      '5':
+        name: '5'
+        rps_capacity: 62909
+      '7':
+        name: '7'
+        rps_capacity: 482044
+      '8':
+        name: '8'
+        rps_capacity: 643246
+      '9':
+        name: '9'
+        rps_capacity: 260569
+  gcp-eu-west-2:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 50704
+      '5':
+        name: '5'
+        rps_capacity: 63388
+      '8':
+        name: '8'
+        rps_capacity: 643395
+  gcp-eu-west-3:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '5':
+        name: '5'
+        rps_capacity: 62190
+      '6':
+        name: '6'
+        rps_capacity: 654017
+      '9':
+        name: '9'
+        rps_capacity: 261886
+  gcp-northamerica-northeast-1:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '5':
+        name: '5'
+        rps_capacity: 63187
+      '6':
+        name: '6'
+        rps_capacity: 655679
+      '8':
+        name: '8'
+        rps_capacity: 644468
+      '9':
+        name: '9'
+        rps_capacity: 261690
+  gcp-sa-east-1:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 50422
+      '5':
+        name: '5'
+        rps_capacity: 63211
+      '6':
+        name: '6'
+        rps_capacity: 655789
+      '7':
+        name: '7'
+        rps_capacity: 481462
+      '8':
+        name: '8'
+        rps_capacity: 642295
+      '9':
+        name: '9'
+        rps_capacity: 260991
+  gcp-us-central-1:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '4':
+        name: '4'
+        rps_capacity: 72080
+      '5':
+        name: '5'
+        rps_capacity: 62789
+      '7':
+        name: '7'
+        rps_capacity: 481020
+  gcp-us-east-1:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '10':
+        name: '10'
+        rps_capacity: 3117607
+      '2':
+        name: '2'
+        rps_capacity: 50276
+      '4':
+        name: '4'
+        rps_capacity: 71951
+      '5':
+        name: '5'
+        rps_capacity: 63345
+      '7':
+        name: '7'
+        rps_capacity: 482372
+      '9':
+        name: '9'
+        rps_capacity: 261441
+  gcp-us-east-4:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '2':
+        name: '2'
+        rps_capacity: 50637
+      '4':
+        name: '4'
+        rps_capacity: 72364
+      '5':
+        name: '5'
+        rps_capacity: 63234
+      '9':
+        name: '9'
+        rps_capacity: 260720
+  gcp-us-west-1:
+    services:
+      '0':
+        name: '0'
+        rps_capacity: 30000
+      '1':
+        name: '1'
+        rps_capacity: 30000
+      '10':
+        name: '10'
+        rps_capacity: 3116651
+      '2':
+        name: '2'
+        rps_capacity: 50112
+      '4':
+        name: '4'
+        rps_capacity: 71595
+      '5':
+        name: '5'
+        rps_capacity: 63351
+      '7':
+        name: '7'
+        rps_capacity: 482721
+      '8':
+        name: '8'
+        rps_capacity: 642196
+      '9':
+        name: '9'
+        rps_capacity: 260904
+services:
+  '0':
+    dependencies:
+      '10':
+        name: '10'
+        req_size: 50
+      '3':
+        name: '3'
+        req_size: 50
+      '5':
+        name: '5'
+        req_size: 50
+      '7':
+        name: '7'
+        req_size: 50
+      '8':
+        name: '8'
+        req_size: 50
+      '9':
+        name: '9'
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+    label: front-end
+    name: '0'
+  '1':
+    dependencies:
+      '10':
+        name: '10'
+        req_size: 50
+      '2':
+        name: '2'
+        req_size: 50
+      '3':
+        name: '3'
+        req_size: 50
+      '4':
+        name: '4'
+        req_size: 50
+      '5':
+        name: '5'
+        req_size: 50
+      '6':
+        name: '6'
+        req_size: 50
+      '7':
+        name: '7'
+        req_size: 50
+      '9':
+        name: '9'
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+    label: front-end
+    name: '1'
+  '10':
+    dependencies: {}
+    expected-outbound-req-size-kb: 50
+    label: internal
+    name: '10'
+  '2':
+    dependencies:
+      '10':
+        name: '10'
+        req_size: 50
+      '6':
+        name: '6'
+        req_size: 50
+      '8':
+        name: '8'
+        req_size: 50
+      '9':
+        name: '9'
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+    label: internal
+    name: '2'
+  '3':
+    dependencies:
+      '10':
+        name: '10'
+        req_size: 50
+      '7':
+        name: '7'
+        req_size: 50
+      '8':
+        name: '8'
+        req_size: 50
+      '9':
+        name: '9'
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+    label: internal
+    name: '3'
+  '4':
+    dependencies:
+      '10':
+        name: '10'
+        req_size: 50
+      '6':
+        name: '6'
+        req_size: 50
+      '8':
+        name: '8'
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+    label: internal
+    name: '4'
+  '5':
+    dependencies:
+      '6':
+        name: '6'
+        req_size: 50
+      '8':
+        name: '8'
+        req_size: 50
+      '9':
+        name: '9'
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+    label: internal
+    name: '5'
+  '6':
+    dependencies:
+      '10':
+        name: '10'
+        req_size: 50
+      '7':
+        name: '7'
+        req_size: 50
+      '8':
+        name: '8'
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+    label: internal
+    name: '6'
+  '7':
+    dependencies: {}
+    expected-outbound-req-size-kb: 50
+    label: internal
+    name: '7'
+  '8':
+    dependencies:
+      '10':
+        name: '10'
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+    label: internal
+    name: '8'
+  '9':
+    dependencies:
+      '10':
+        name: '10'
+        req_size: 50
+    expected-outbound-req-size-kb: 50
+    label: internal
+    name: '9'

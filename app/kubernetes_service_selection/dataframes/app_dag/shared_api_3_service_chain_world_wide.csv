@@ -1,0 +1,7 @@
+source,target
+product_page,review
+product_page,details
+dashboard,main_db
+review,rating
+user_page,details
+user_page,main_db
