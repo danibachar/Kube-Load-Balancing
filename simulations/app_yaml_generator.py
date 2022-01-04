@@ -13,61 +13,6 @@ def get_all_dependent_services(service_name, dep_dict):
       # print("{} IS NOT dependent of {}".format(name, service_name))
   return dependant_services
 
-def get_app_topology(clusters, dep_dict):
-  yaml_ready_topology = {}
-  front_end_load = {}
-  internal_svc_count = {}
-  total_fe_load = len(clusters)*30_000
-  for cluster in clusters:
-    yaml_ready_topology[cluster] = {
-        "services": {}
-    }
-    for svc_name, data in dep_dict.items():
-      # fornt-end must be present in each cluster, with capacity of 30k
-      if data["label"] == "front-end":
-
-        yaml_ready_topology[cluster]["services"][svc_name] = {
-            "name": svc_name,
-            "rps_capacity": 30_000
-        }
-        front_end_load[svc_name] = front_end_load.get(svc_name,0) + 30_000
-      # If internal service - random if to add or not 35% to add
-      # But add at least one service!
-      elif svc_name not in internal_svc_count or random.randrange(100) / 100 >= 0.65:
-        
-        yaml_ready_topology[cluster]["services"][svc_name] = {
-            "name": svc_name,
-            "rps_capacity": 0 # TODO we generate capacity to adapt to the general
-        }
-        internal_svc_count[svc_name] = internal_svc_count.get(svc_name,0) + 1
-
-  # print(internal_svc_count)
-  # print(front_end_load)
-  # After topology is set, apply capacity to non-fe services
-  # We need to pass layer by layer as it is affecting, we assume (l=10)a(c=10) -> (l=10)b
-  for svc_name, data in dep_dict.items():
-    dependents = get_all_dependent_services(svc_name, dep_dict)
-    
-    if len(dependents) == 0: # We are at source, i.e front-end we already set capacity
-      print("1 skipping {}".format(svc_name))
-      continue
-
-    # print("{} depend on {}".format(dependents, svc_name))
-    # for dependent in dependents:
-    if svc_name not in internal_svc_count:
-      print("2 skipping {}".format(svc_name))
-      continue
-
-    instance_count = internal_svc_count[svc_name]
-    capacity = math.ceil((total_fe_load * len(dependents) / instance_count) * 1.1)
-
-    for cluster_name, cluster_content in yaml_ready_topology.items():
-      for instance_name, services_data in cluster_content["services"].items():
-        if svc_name == instance_name:
-          services_data["rps_capacity"] = capacity
-
-  return yaml_ready_topology
-
 def get_dependencies_dict(G):
   assert(nx.algorithms.dag.is_directed_acyclic_graph(G))
 
@@ -129,25 +74,6 @@ def simulate_dag(
 
   assert(nx.algorithms.dag.is_directed_acyclic_graph(G))
   return G
-
-
-def generate_random_apps(application_count):
-    for _ in range(application_count):
-        G = simulate_dag()
-        data_centers = list(map(lambda x: x[0], load_ymal("yamls/datacenters.yml").items()))
-        random_clusters = random.choices(data_centers, k=random.randint(3, len(data_centers))) # one cluster pr DC at least 3 clusters
-
-        services_dict = get_dependencies_dict(G)
-        topology_dict = get_app_topology(random_clusters, services_dict)
-        data = {
-            "app-topology": topology_dict,
-            "services": services_dict
-        }
-        with open('yamls/application_ymals/random/{}.yml'.format(time.time()), 'w') as outfile:
-            yaml.dump(data, outfile, default_flow_style=False)
-
-
-################
 
 # Random
 def randomize_service_instance_count(max_count):
@@ -286,9 +212,6 @@ def new_generator():
   int_services = _internal_service(services_dict)
   assign_internal_services(int_services, clusters, topology_skeleton)
 
-  # Recursion!
-  # 3) Calcualte capacity by dependent - i.e the amount of service that will generate load on that specific service
-  # 3.1) Randomize capacity per placement
   update_internal_services_capacity(G, services_dict, topology_skeleton)
 
   data = {
@@ -300,6 +223,5 @@ def new_generator():
 
 
 if __name__ == '__main__':
-    # generate_random_apps(3)
     for _ in range(5):
       new_generator()
