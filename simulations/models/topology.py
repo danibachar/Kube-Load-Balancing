@@ -1,4 +1,27 @@
-import logging
+import logging, requests, xmltodict, random
+from ratelimit import limits, sleep_and_retry
+
+cache = {}
+
+# Free API is limited to one request per second, which is ok
+ONE_SEC = 1
+MAX_CALLS_PER_SEC = 1
+@sleep_and_retry
+@limits(calls=MAX_CALLS_PER_SEC, period=ONE_SEC)
+def _remote_gmt_offset_by(url):
+    res = requests.get(url)
+    result = xmltodict.parse(res.content)
+    offset = result.get("result", {}).get("gmtOffset", "-1")
+    return int(offset) / 60 # minutes
+
+def gmt_offset_by(lon, lat, counter=0): 
+    url = "http://api.timezonedb.com/v2.1/get-time-zone?key=F82EPEI8QYD1&by=position&lat={}&lng={}".format(lat, lon)
+    cached_offset = cache.get(url, None)
+    if cached_offset is not None:
+        return cached_offset
+    offset = _remote_gmt_offset_by(url)
+    cache[url] = offset
+    return offset
 
 class Zone:
     """Representing a Topology"""
@@ -67,8 +90,9 @@ class Zone:
         logging.debug("checking latency from:{} <-> to:{}".format(self.name, other_zone.name))
         if other_zone.name not in self.latency:
             raise
-        latency = self.latency.get(other_zone.name, 0)
-        return latency
+        latency = self.latency.get(other_zone.name, 0) / 1000
+        # Randomize some diviation in the latency
+        return latency # + latency * random.uniform(-0.1, 0.1)
 
 class CloudProvider:
     """Representing a Cloud Provider"""
@@ -92,6 +116,7 @@ class Region:
     def __init__(self, id, location):
         self.id = id
         self.location = location
+        self.gmt_offset = gmt_offset_by(location["lon"], location["lat"])
 
     def __str__(self):
         return str(self.__class__) + ": " + str(self.__dict__)

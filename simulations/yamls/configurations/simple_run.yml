@@ -1,46 +1,87 @@
 base_config:
   funcs:
-    RR:
-      weight_calc: round_robin
+    # RR:
+    #   weight_calc: round_robin
     # WRR:
     #   weight_calc: smooth_weighted_round_robin
     KOSS:
       weight_calc: model
-  tiks_count: 500 # Must have more than 200 tiks!!!
+  tiks_count: 200 #500 #1440 #full day in minutes #86400 # Full day in seconds #500 # Must have more than 200 tiks!!!
   rps:
-    - 26_000
+    # - 26_000
+    # - 28_000
+    # - 30_000
+    # - 35_000
+    - 40_000
+    # - 45_000
+    # - 50_000
   distribution: pareto
-  rounds: 20
+  weights_update_intervals: 
+    # - 5
+    # - 10
+    - 60
+    - 150
+    # - 300
+    # - 600
+    # - 800
+    # - 1000
+  rounds: 1
   cost_function:
     price_weight:
       - 0.01
-      - 0.1
-      - 0.2
-      - 0.3
-      - 0.4
-      - 0.5
-      - 0.6
-      - 0.7
-      - 0.8
-      - 0.9
-      - 0.99
+      # - 0.1
+      # - 0.2
+      # - 0.3
+      # - 0.4
+      # - 0.5
+      # - 0.6
+      # - 0.7
+      # - 0.8
+      # - 0.9
+      # - 0.99
     latency_weight:
       - 0.99
-      - 0.9
-      - 0.8
-      - 0.7
-      - 0.6
-      - 0.5
-      - 0.4
-      - 0.3
-      - 0.2
-      - 0.1
-      - 0.01
+      # - 0.9
+      # - 0.8
+      # - 0.7
+      # - 0.6
+      # - 0.5
+      # - 0.4
+      # - 0.3
+      # - 0.2
+      # - 0.1
+      # - 0.01
 simulation_ymals:
   apps:
+      # Random
+      #######################################################################
+      # DONE - KOSS and RR same
+      # - yamls/application_ymals/random/1641184994.556452.yml
+      # - yamls/application_ymals/random/1641184996.688477.yml
+      # - yamls/application_ymals/random/1641185009.507437.yml
+      # - yamls/application_ymals/random/1641185036.1124108.yml
+
+      # - yamls/application_ymals/random/1641265102.411205.yml
+      # - yamls/application_ymals/random/1641265114.138346.yml
+      # - yamls/application_ymals/random/1641265115.5916018.yml
+      # - yamls/application_ymals/random/1641265135.944203.yml
+      # - yamls/application_ymals/random/1641265307.6291862.yml
+      #######################################################################
+
+      #######################################################################
+      # DONE - KOSS and RR same
+      # - yamls/application_ymals/redhat/cockroach_db_x3_multi_cluster.yml
+      #######################################################################
+
       #######################################################################
       # DONE - No matter how many ticks or rounds will be converge to 2 points
-      # - yamls/application_ymals/bookinfo_api_istio_worldwide.yml
+      # - yamls/application_ymals/redhat/cockroach_db_x10_multi_cluster.yml
+      #######################################################################
+
+
+      #######################################################################
+      # DONE - No matter how many ticks or rounds will be converge to 2 points
+      - yamls/application_ymals/bookinfo_api_istio_worldwide.yml
       #######################################################################
 
       #######################################################################
@@ -55,7 +96,7 @@ simulation_ymals:
 
       #######################################################################
       # DONE - Become normal only after 200 tiks with at least 1 round
-      # - yamls/application_ymals/bookinfo_api_istio_asia_eu_dep.yml
+      - yamls/application_ymals/bookinfo_api_istio_asia_eu_dep.yml
       #######################################################################
 
       #######################################################################
@@ -71,7 +112,7 @@ simulation_ymals:
       #######################################################################
       # DONE - No matter how many ticks or rounds will be converge to 2 points
       # Possible palying with config
-      # - yamls/application_ymals/bookinfo_api_istio_america.yml
+      - yamls/application_ymals/bookinfo_api_istio_america.yml
       #######################################################################
 
       #######################################################################

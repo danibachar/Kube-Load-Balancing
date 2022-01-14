@@ -28,9 +28,15 @@ def simple_max_addative_weight(
     latency_weight
 ):
     if max_price == 0:
-        raise
+        if price == 0:
+            price = max_price = 1
+        else:
+            raise Exception("max_price == 0")
     if max_latency == 0:
-        raise
+        if latency == 0:
+            latency = max_latency = 1
+        else:
+            raise Exception("max_latency == 0")
 
     price_part = (price / max_price) * price_weight
     latency_part = (latency / max_latency) * latency_weight

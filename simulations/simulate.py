@@ -1,31 +1,30 @@
-import sys, argparse, logging, time, json, random, multiprocessing
+import argparse, logging, time, multiprocessing
 from timeit import default_timer as timer
-from datetime import datetime
-import numpy as np
 import pandas as pd
+import numpy as np
 
 from models import Job
 
 from utils.distributions import heavy_tail_jobs_distribution
 from utils.weights import weights_for
-from utils.helpers import capacity_csv_builder, heatmaps_csv_builder, app_dag_csv_builder
+from utils.csv_builders import capacity_csv_builder, heatmaps_csv_builder, app_dag_csv_builder, time_of_day_load_csv_builder, drops_csv_builder, main_csv_builder
+from utils.chaos_generator import load_by_time_of_day_from, random_chaos_into
 
 from application_generator import generate_application
-from dataframe_ploters import plot_df, plot_maps
 from config_builder import build_config
 
 def update_clusters_weights(clusters, weighting_technique, at_tik, cost_function_weights):
-    s = timer()
+    # ss = time.time()
     for cluster in clusters:
         cluster.build_services_df()
     weights = weights_for(weighting_technique, clusters, at_tik, cost_function_weights)
-    e = timer()
 
     if weights == None:
         print("weights update error")
         return
     for cluster in clusters:
         cluster.weights = weights
+    # print("update clusters took ", time.time()-ss)
 
 def run(
     clusters,
@@ -33,22 +32,76 @@ def run(
     front_ends,
     updating_weights_technique,
     avg_job_duration,
-    weightes_update_interval,
+    weights_update_interval,
     cost_function_weights
 ):
-    for tik, load in enumerate(jobs_loads):
-        start_time = time.time()
-        if tik % weightes_update_interval == 0:
-            update_clusters_weights(clusters, updating_weights_technique, tik, cost_function_weights)
-        for cluster in clusters:
-            for front_end in front_ends:
-                job = Job(None, cluster.zone, avg_job_duration, load, front_end)
-                cluster.consume(job, tik*1000)
+    # print("run:\n- interval = {}\n- cost_mix = {}\n- weights = {}".format(weights_update_interval, cost_function_weights, updating_weights_technique))
+    # Each simulation is of a 24hrs timeframe
+    # assert(len(jobs_loads) == 2880)
+    for tik_in_min, load in enumerate(jobs_loads): # Each tik indicates a minute
+        # s = time.time()
+        # Generate chaos BEFORE updating weights
+        # Inject some chaos, like cluster un-availability, pods drops (i.e capacity affected)
+        # tik_in_min = tik_in_min % 1439
+        if tik_in_min % weights_update_interval == 0: 
+            # print("updateing weights with interval {} at tik {}".format(weights_update_interval, tik))
+            # Time of day in minutes
+            update_clusters_weights(clusters, updating_weights_technique, tik_in_min*60, cost_function_weights)
+        start = tik_in_min*60
+        end = start + 60
+        for tik_in_seconds in range(start, end):
+            for cluster in clusters:
+                # Update load by time of day
+                load_by_time_of_day = load_by_time_of_day_from(load, tik_in_min, cluster.zone.region.gmt_offset)
+                # print("sending {} on cluster {}".format(load_by_time_of_day, cluster.id))
+                for front_end in front_ends:
+                    # job = Job(None, cluster.zone, avg_job_duration, load_by_time_of_day, type=front_end)
+                    job = Job(None, cluster.zone, load_by_time_of_day, type=front_end)
+                    cluster.consume(job, tik_in_seconds)
+
+        continue
+
+        if tik < 1440:
+            # tik = tik * 1000
+            if tik == 0:
+                update_clusters_weights(clusters, updating_weights_technique, tik, cost_function_weights)
+            for cluster in clusters:
+                # Update load by time of day
+                load_by_time_of_day = load_by_time_of_day_from(load, tik, cluster.zone.region.gmt_offset)
+                # print("load {} at {} for {}".format(load_by_time_of_day, tik, cluster.id))
+                # print("sending {} on cluster {}".format(load_by_time_of_day, cluster.id))
+                for front_end in front_ends:
+                    # job = Job(None, cluster.zone, avg_job_duration, load_by_time_of_day, type=front_end)
+                    job = Job(None, cluster.zone, load_by_time_of_day, type=front_end)
+                    cluster.consume(job, tik)
+        else:
+            if tik == 1440:
+                print("#######################")
+                print("switchinng to next day")
+                print("#######################")
+            # tik = tik * 1000
+            # random_chaos_into(clusters=clusters)
+            if tik % weights_update_interval == 0: 
+                # print("updateing weights with interval {} at tik {}".format(weights_update_interval, tik))
+                update_clusters_weights(clusters, updating_weights_technique, tik, cost_function_weights)
+                
+            for cluster in clusters:
+                # Update load by time of day
+                load_by_time_of_day = load_by_time_of_day_from(load, tik, cluster.zone.region.gmt_offset)
+                # print("load {} at {} for {}".format(load_by_time_of_day, tik, cluster.id))
+                # print("sending {} on cluster {}".format(load_by_time_of_day, cluster.id))
+                for front_end in front_ends:
+                    # job = Job(None, cluster.zone, avg_job_duration, load_by_time_of_day, type=front_end)
+                    job = Job(None, cluster.zone, load_by_time_of_day, type=front_end)
+                    cluster.consume(job, tik)
+        # print("running single tik took ", time.time() - s)
+        
 
 def run_app(config, clusters, front_ends):
     funcs = config["funcs"]
     tiks_count = config["tiks_count"]
     rpses = config["rps"]
+    weights_update_intervals = config["weights_update_intervals"]
     distribution_name = config["distribution"]
 
     price_weights = config["cost_function"]["price_weight"]
@@ -56,24 +109,33 @@ def run_app(config, clusters, front_ends):
 
     dfs = []
     for rps in rpses:
+        # TODO - add some randomness into the distribution, i.e calls not arrived equally for all FE.
+        # Simulate different time of day loads accordsing to articles
         jobs_loads = heavy_tail_jobs_distribution(distribution_name, tiks_count, rps)
-        for pw, lw in zip(price_weights, latency_weights):
-            for name, val in funcs.items():
-                for cluster in clusters:
-                    cluster.reset_state()
-                run(
-                    clusters=clusters,
-                    jobs_loads=jobs_loads,
-                    front_ends=front_ends,
-                    updating_weights_technique=val["weight_calc"],
-                    avg_job_duration=100,
-                    weightes_update_interval=10,
-                    cost_function_weights=[pw, lw]
-                )
-                df = pd.concat([s.job_data_frame for cluster in clusters for s in cluster.services.values() ])
-                df["load_balance"] = name
-                df["cost_mix"] = "beta={}".format(pw)
-                dfs.append(df)
+        jobs_loads = np.concatenate([jobs_loads, jobs_loads])
+        for weights_update_interval in weights_update_intervals:
+            for pw, lw in zip(price_weights, latency_weights):
+                for name, val in funcs.items():
+                        for cluster in clusters:
+                            cluster.reset_state()
+                        s = time.time()
+                        run(
+                            clusters=clusters,
+                            jobs_loads=jobs_loads,
+                            front_ends=front_ends,
+                            updating_weights_technique=val["weight_calc"],
+                            avg_job_duration=100,
+                            weights_update_interval=weights_update_interval,
+                            cost_function_weights=[pw, lw]
+                        )
+                        print("just run took ", time.time() - s)
+                        for cluster in clusters:
+                            cluster.build_services_df()
+                        df = pd.concat([s.job_data_frame for cluster in clusters for s in cluster.services.values()])
+                        df["load_balance"] = name
+                        df["cost_mix"] = "beta={}".format(pw)
+                        df["weights_update_interval"] = weights_update_interval
+                        dfs.append(df)
 
 
     return pd.concat(dfs)
@@ -97,13 +159,10 @@ def main(config):
     datacenters_yml = ymals["datacenters_locations"]
     number_of_rounds = config["rounds"]
 
-    app_name_to_dfs = {}
-    clusters_to_app_map = {}
-    total_start_time = time.time()
+    s = time.time()
     for key, app_ymal in app_ymals.items():
         app_name = key.split("/")[-1].split(".")[0]
         print("Building app - ", app_name)
-        clusters, front_ends = generate_application(app_ymal, latency_ymal, prcing_ymal, datacenters_yml, app_name)
 
         p = multiprocessing.Pool(multiprocessing.cpu_count())
         args = []
@@ -113,39 +172,39 @@ def main(config):
             args.append([i, config, clusters, front_ends])
 
         dfs = p.map(run_app_multi_processing, args)
-        clusters_to_app_map[app_name] = clusters
-        app_name_to_dfs[app_name] = pd.concat(dfs)
+        df = pd.concat(dfs)
+        dump_test_results(app_name, clusters, df)
 
-    print("running main  {} times took  = {}".format(number_of_rounds, time.time()-total_start_time))
-    return app_name_to_dfs, clusters_to_app_map
+    print("running main  {} times took  = {}".format(number_of_rounds, time.time()-s))
 
+def dump_test_results(app_name, clusters, df):
+    print("Dumping results for ", app_name)
 
+    heatmaps_csv_builder(clusters, app_name)
+    capacity_csv_builder(clusters, app_name)
+    app_dag_csv_builder(clusters, app_name)
 
-def _preps_df(df):
-    price_col = "gb_price"
-    latency_col = "latency"
-    group_cols = [
-        "job_type",
-        "cloud_provider",
-        "cluster_name",
-        "lat",
-        "lon",
-        "source_zone_id",
-        "target_zone_id",
-        "load_balance",
-        "cost_mix",
-        "source_job_type",
-    ]
-    groups = df.groupby(group_cols)
-    dfs = []
-    for names, group_df in groups:
-        group_df[price_col] = group_df["cost_in_usd"] / group_df["size_in_gb"]
-        data = list(names) + [group_df[price_col].mean(), group_df[latency_col].mean()]
-        data = [[val] for val in data]
-        cols = group_cols + [price_col, latency_col]
-        dfs.append(pd.DataFrame(np.array(data).T, columns=cols))
+    time_of_day_load_csv_builder(df, app_name)
 
-    return pd.concat(dfs)
+    # drops_csv_builder(df, app_name)
+    # df.to_csv("../app/kubernetes_service_selection/dataframes/full/{}.csv".format(app_name))
+    # drop_selector = df["is_dropped"] == 1
+    # no_drop_selector = df["is_dropped"] == 0
+
+    # main_csv_builder(df[drop_selector], app_name+"_just_drops")
+    # main_csv_builder(df[no_drop_selector], app_name+"_no_drops")
+
+    main_csv_builder(df, app_name)
+    df = df[df["arrival_time"] > 1_439 * 60]
+
+    # drop_selector = df["is_dropped"] == 1
+    # no_drop_selector = df["is_dropped"] == 0
+
+    # main_csv_builder(df[drop_selector], app_name+"_filtered_at_just_drops")
+    # main_csv_builder(df[no_drop_selector], app_name+"_filtered_at_no_drops")
+    main_csv_builder(df, app_name+"_arrival_time")
+
+    
 
 
 if __name__ == '__main__':
@@ -161,13 +220,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     config_file_name = args.config_file_name
     config = build_config(config_file_name)
-
-    app_name_to_df_map, clusters_to_app_map = main(config)
-    for app_name, clusters in clusters_to_app_map.items():
-        heatmaps_csv_builder(clusters, app_name)
-        capacity_csv_builder(clusters, app_name)
-        app_dag_csv_builder(clusters, app_name)
-
-    for app_name, df in app_name_to_df_map.items():
-        df = _preps_df(df)
-        df.to_csv("run_csv/main/{}.csv".format(app_name))
+    main(config)

@@ -65,10 +65,18 @@ def time_of_day_load_csv_builder(df, app_name):
     lines = []
     groups = df.groupby(group_cols)
     for _, group_df in groups:
+        # print("cost_mix", group_df["cost_mix"].to_numpy())
+        # print("load_balance", group_df["load_balance"].to_numpy())
+        # print("load", group_df["load"].to_numpy())
+        # print("arrival_time", group_df["arrival_time"].to_numpy())
         line = [
             group_df["source_zone_id"].to_numpy()[0] + "->" + group_df["target_zone_id"].to_numpy()[0], 
             group_df["source_zone_id"].to_numpy()[0], 
             group_df["target_zone_id"].to_numpy()[0],
+            
+            group_df["source_job_type"].to_numpy()[0] + "->" + group_df["job_type"].to_numpy()[0], 
+            group_df["source_job_type"].to_numpy()[0], 
+            group_df["job_type"].to_numpy()[0],
 
             group_df["arrival_time"].to_numpy()[0], 
 
@@ -78,39 +86,13 @@ def time_of_day_load_csv_builder(df, app_name):
             group_df["cost_mix"].to_numpy()[0],
         ]
         lines.append(line)
-        
-    d = pd.DataFrame(np.array(lines), columns=["name", "source", "target", "time", "load", "load_balance", "cost_mix",])
+    if len(lines) == 0:
+        print("no time of day dfs ", app_name)
+        return
+    d = pd.DataFrame(np.array(lines), columns=["name", "source", "target", "job_name", "source_job", "target_job", "time", "load", "load_balance", "cost_mix",])
     d.to_csv("../app/kubernetes_service_selection/dataframes/load/{}.csv".format(app_name), index=False)
     
-def update_rate_to_converge_csv_builder(df, app_name):
-    price_col = "gb_price"
-    latency_col = "latency"
-    group_cols = [
-        "job_type",
-        "cloud_provider",
-        "cluster_name",
-        "lat",
-        "lon",
-        "source_zone_id",
-        "target_zone_id",
-        "load_balance",
-        "cost_mix",
-        "source_job_type",
-    ]
-    groups = df.groupby(group_cols)
-    dfs = []
-    for names, group_df in groups:
-        group_df[price_col] = group_df["cost_in_usd"] / group_df["size_in_gb"]
-        data = list(names) + [group_df[price_col].mean(), group_df[latency_col].mean()]
-        data = [[val] for val in data]
-        cols = group_cols + [price_col, latency_col]
-        dfs.append(pd.DataFrame(np.array(data).T, columns=cols))
-
-    pd.concat(dfs).to_csv("../app/kubernetes_service_selection/dataframes/main/{}.csv".format(app_name))
-
-def main_csv_builder(df, app_name):
-    price_col = "gb_price"
-    latency_col = "latency"
+def drops_csv_builder(df, app_name):
     group_cols = [
         "job_type",
         "cloud_provider",
@@ -125,14 +107,56 @@ def main_csv_builder(df, app_name):
         "weights_update_interval",
 
     ]
+    df.groupby(group_cols).agg({ 'is_dropped': np.sum }).to_csv("../app/kubernetes_service_selection/dataframes/drops/agg_{}.csv".format(app_name))
+
+    df["is_dropped"].to_csv("../app/kubernetes_service_selection/dataframes/drops/{}.csv".format(app_name))
+
+def main_csv_builder(df, app_name):
+    price_col = "gb_price"
+    latency_col = "latency"
+
+    response_col_mean = "mean_response_time"
+    response_col_95 = "95th_response_time"
+    response_col_99 = "99th_response_time"
+
+    group_cols = [
+        "job_type",
+        "cloud_provider",
+        "cluster_name",
+        # "capacity",
+        # "arrival_time",
+        "lat",
+        "lon",
+        "source_zone_id",
+        "target_zone_id",
+        "load_balance",
+        "cost_mix",
+        "source_job_type",
+        "weights_update_interval",
+    ]
     groups = df.groupby(group_cols)
     dfs = []
     for names, group_df in groups:
-        group_df[price_col] = group_df["cost_in_usd"] / group_df["size_in_gb"]
-        data = list(names) + [group_df[price_col].mean(), group_df[latency_col].mean()]
-        data = [[val] for val in data]
-        cols = group_cols + [price_col, latency_col]
-        dfs.append(pd.DataFrame(np.array(data).T, columns=cols))
 
+        # dropped = group_df[group_df["is_dropped"] == 0]
+        # not_dropped = group_df[group_df["is_dropped"] == 1]
+
+        group_df[price_col] = group_df["cost_in_usd"] / group_df["size_in_gb"]
+        data = list(names) + [group_df[price_col].mean(), 
+                              group_df[latency_col].mean(),
+                              group_df["duration"].mean(),
+                              np.percentile(group_df["duration"].to_list(), 95),
+                              np.percentile(group_df["duration"].to_list(), 99),
+                              group_df["drop_rate"].mean(),]
+        data = [[val] for val in data]
+        
+        cols = group_cols + [price_col, latency_col, 
+                            response_col_mean, response_col_95, response_col_99,
+                            "mean_drop_rate"]
+
+        dfs.append(pd.DataFrame(np.array(data).T, columns=cols))
+    if len(dfs) == 0:
+        print("no main dfs ", app_name)
+        return
     pd.concat(dfs).to_csv("../app/kubernetes_service_selection/dataframes/main/{}.csv".format(app_name))
     

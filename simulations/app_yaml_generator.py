@@ -47,6 +47,11 @@ def simulate_dag(
     min_ranks = 2, max_ranks = 5, # Ranks: How 'tall' the DAG should be
     edge_prob = 0.3 # Chance of having an Edge
   ):
+  nodes = random.randint(3,20)
+  G = nx.gnp_random_graph(nodes, 0.5, directed=True)
+  G = nx.DiGraph([(u,v) for (u,v) in G.edges() if u<v])
+  assert(nx.algorithms.dag.is_directed_acyclic_graph(G))
+  return G
   G = nx.DiGraph()
   nodes = 0
   ranks = min_ranks + (random.randrange(100_000) % (max_ranks - min_ranks + 1))

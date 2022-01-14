@@ -1,17 +1,19 @@
 \* Service_Selection_Problem *\
 Minimize
-OBJ: 0.99 product_page_aws_sa_east_1_1_review_aws_sa_east_1_1
- + 0.0717391304348 product_page_aws_sa_east_1_1_review_aws_us_east_1_1
- + 0.066 product_page_aws_sa_east_1_1_review_gcp_eu_west_1_1
- + 0.495 product_page_aws_us_east_1_1_review_aws_sa_east_1_1
- + 0.99 product_page_aws_us_east_1_1_review_aws_us_east_1_1
- + 0.11 product_page_aws_us_east_1_1_review_gcp_eu_west_1_1
- + 0.726145833333 product_page_gcp_asia_east_1_1_review_aws_sa_east_1_1
- + 0.73 product_page_gcp_asia_east_1_1_review_aws_us_east_1_1
- + 0.996507352941 product_page_gcp_asia_east_1_1_review_gcp_eu_west_1_1
- + 0.723563218391 product_page_gcp_us_west_1_1_review_aws_sa_east_1_1
- + 0.73 product_page_gcp_us_west_1_1_review_aws_us_east_1_1
- + 0.993502824859 product_page_gcp_us_west_1_1_review_gcp_eu_west_1_1
+OBJ: 0.000666666666667 product_page_aws_sa_east_1_1_review_aws_sa_east_1_1
+ + 0.572884210526 product_page_aws_sa_east_1_1_review_aws_us_east_1_1
+ + product_page_aws_sa_east_1_1_review_gcp_eu_west_1_1
+ + 0.992222222222 product_page_aws_us_east_1_1_review_aws_sa_east_1_1
+ + 0.00111111111111 product_page_aws_us_east_1_1_review_aws_us_east_1_1
+ + 0.6865 product_page_aws_us_east_1_1_review_gcp_eu_west_1_1
+ + product_page_gcp_asia_east_1_1_review_aws_sa_east_1_1
+ + 0.6184375 product_page_gcp_asia_east_1_1_review_aws_us_east_1_1
+ + 0.942272727273 product_page_gcp_asia_east_1_1_review_gcp_eu_west_1_1
+ + product_page_gcp_eu_west_1_1_review_aws_sa_east_1_1
+ + 0.401285714286 product_page_gcp_eu_west_1_1_review_aws_us_east_1_1
+ + 0.983220338983 product_page_gcp_us_west_1_1_review_aws_sa_east_1_1
+ + 0.356779661017 product_page_gcp_us_west_1_1_review_aws_us_east_1_1
+ + 0.997272727273 product_page_gcp_us_west_1_1_review_gcp_eu_west_1_1
 Subject To
 _C1: product_page_aws_us_east_1_1_review_aws_sa_east_1_1
  + product_page_aws_us_east_1_1_review_aws_us_east_1_1
@@ -44,19 +46,19 @@ _C8: product_page_aws_sa_east_1_1_review_aws_sa_east_1_1
  + product_page_gcp_eu_west_1_1_review_aws_sa_east_1_1
  + product_page_gcp_us_west_1_1_review_aws_sa_east_1_1 <= 60000
 Bounds
-product_page_aws_sa_east_1_1_review_aws_sa_east_1_1 <= 29990
-product_page_aws_sa_east_1_1_review_aws_us_east_1_1 <= 29990
-product_page_aws_sa_east_1_1_review_gcp_eu_west_1_1 <= 29990
-product_page_aws_us_east_1_1_review_aws_sa_east_1_1 <= 29990
-product_page_aws_us_east_1_1_review_aws_us_east_1_1 <= 29990
-product_page_aws_us_east_1_1_review_gcp_eu_west_1_1 <= 29990
-product_page_gcp_asia_east_1_1_review_aws_sa_east_1_1 <= 29990
-product_page_gcp_asia_east_1_1_review_aws_us_east_1_1 <= 29990
-product_page_gcp_asia_east_1_1_review_gcp_eu_west_1_1 <= 29990
-product_page_gcp_eu_west_1_1_review_aws_sa_east_1_1 <= 29990
-product_page_gcp_eu_west_1_1_review_aws_us_east_1_1 <= 29990
-product_page_gcp_eu_west_1_1_review_gcp_eu_west_1_1 <= 29990
-product_page_gcp_us_west_1_1_review_aws_sa_east_1_1 <= 29990
-product_page_gcp_us_west_1_1_review_aws_us_east_1_1 <= 29990
-product_page_gcp_us_west_1_1_review_gcp_eu_west_1_1 <= 29990
+product_page_aws_sa_east_1_1_review_aws_sa_east_1_1 <= 30000
+product_page_aws_sa_east_1_1_review_aws_us_east_1_1 <= 30000
+product_page_aws_sa_east_1_1_review_gcp_eu_west_1_1 <= 30000
+product_page_aws_us_east_1_1_review_aws_sa_east_1_1 <= 30000
+product_page_aws_us_east_1_1_review_aws_us_east_1_1 <= 30000
+product_page_aws_us_east_1_1_review_gcp_eu_west_1_1 <= 30000
+product_page_gcp_asia_east_1_1_review_aws_sa_east_1_1 <= 30000
+product_page_gcp_asia_east_1_1_review_aws_us_east_1_1 <= 30000
+product_page_gcp_asia_east_1_1_review_gcp_eu_west_1_1 <= 30000
+product_page_gcp_eu_west_1_1_review_aws_sa_east_1_1 <= 30000
+product_page_gcp_eu_west_1_1_review_aws_us_east_1_1 <= 30000
+product_page_gcp_eu_west_1_1_review_gcp_eu_west_1_1 <= 30000
+product_page_gcp_us_west_1_1_review_aws_sa_east_1_1 <= 30000
+product_page_gcp_us_west_1_1_review_aws_us_east_1_1 <= 30000
+product_page_gcp_us_west_1_1_review_gcp_eu_west_1_1 <= 30000
 End
